@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.7.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Axios作为Vue官方推荐的HTTP请求库，甚至取代了原有的vue-resource，在我第一回接触到axios时，我就在想这个库之所以被官方推荐，和其他同类库相比肯定是有一些特别的地方。  概述在这篇文章里我将会举例说明我所使用过的axios一些特性的使用场景，更多的使用方法可以参考官方文档，本文涉及的特性如下：  Promise API 请求合并 拦截器 请求取消  基本用法第一回使用ax">
+<meta name="keywords" content="浅析,HTTP,模块,axios">
+<meta property="og:type" content="article">
+<meta property="og:title" content="我所接触到的Axios">
+<meta property="og:url" content="http://erioifpud.github.io/2019/01/27/我所接触到的Axios/index.html">
+<meta property="og:site_name" content="Erioifpud">
+<meta property="og:description" content="Axios作为Vue官方推荐的HTTP请求库，甚至取代了原有的vue-resource，在我第一回接触到axios时，我就在想这个库之所以被官方推荐，和其他同类库相比肯定是有一些特别的地方。  概述在这篇文章里我将会举例说明我所使用过的axios一些特性的使用场景，更多的使用方法可以参考官方文档，本文涉及的特性如下：  Promise API 请求合并 拦截器 请求取消  基本用法第一回使用ax">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-01-28T19:15:46.340Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="我所接触到的Axios">
+<meta name="twitter:description" content="Axios作为Vue官方推荐的HTTP请求库，甚至取代了原有的vue-resource，在我第一回接触到axios时，我就在想这个库之所以被官方推荐，和其他同类库相比肯定是有一些特别的地方。  概述在这篇文章里我将会举例说明我所使用过的axios一些特性的使用场景，更多的使用方法可以参考官方文档，本文涉及的特性如下：  Promise API 请求合并 拦截器 请求取消  基本用法第一回使用ax">
+
+
+
+
+
+
+  <link rel="canonical" href="http://erioifpud.github.io/2019/01/27/我所接触到的Axios/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>我所接触到的Axios | Erioifpud</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Erioifpud</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://erioifpud.github.io/2019/01/27/我所接触到的Axios/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Erioifpud">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/8306955?s=460&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Erioifpud">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">我所接触到的Axios
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-27 03:12:51" itemprop="dateCreated datePublished" datetime="2019-01-27T03:12:51+08:00">2019-01-27</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-01-29 03:15:46" itemprop="dateModified" datetime="2019-01-29T03:15:46+08:00">2019-01-29</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <a href="/2019/01/27/我所接触到的Axios/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2019/01/27/我所接触到的Axios/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>Axios作为Vue官方推荐的HTTP请求库，甚至取代了原有的vue-resource，在我第一回接触到axios时，我就在想这个库之所以被官方推荐，和其他同类库相比肯定是有一些特别的地方。</p>
+</blockquote>
+<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>在这篇文章里我将会举例说明我所使用过的axios一些特性的使用场景，更多的使用方法可以参考<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2F4aW9zL2F4aW9z" title="https://github.com/axios/axios">官方文档<i class="fa fa-external-link"></i></span>，本文涉及的特性如下：</p>
+<ul>
+<li>Promise API</li>
+<li>请求合并</li>
+<li>拦截器</li>
+<li>请求取消</li>
+</ul>
+<h2 id="基本用法"><a href="#基本用法" class="headerlink" title="基本用法"></a>基本用法</h2><p>第一回使用axios时，我的感觉是“这和requests库也太像了”，但实际上axios的写法有几种。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 将请求方式写进选项里</span></span><br><span class="line"><span class="comment">// axios(选项)</span></span><br><span class="line">axios(&#123;</span><br><span class="line">  method: <span class="string">'post'</span>,</span><br><span class="line">  url: <span class="string">'localhost'</span>,</span><br><span class="line">  data: &#123;</span><br><span class="line">    hello: <span class="string">'world'</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 将请求方式，url，数据和选项分开写</span></span><br><span class="line"><span class="comment">// axios.请求方式(url, 数据, 选项)</span></span><br><span class="line"><span class="comment">// 或</span></span><br><span class="line"><span class="comment">// axios.请求方式(url, 选项)</span></span><br><span class="line"><span class="comment">// 根据请求方式决定</span></span><br><span class="line">axios.get(<span class="string">'localhost'</span>, &#123;</span><br><span class="line">  hello: <span class="string">'world'</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<p>有些选项是全局通用的，每次请求时都进行局部设置将会不利于维护，axios也提供了修改全局选项的途径，要注意的是<strong>全局选项的优先级要低于局部选项</strong>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 通过create使用给定的选项创建实例，像timeout，baseURL这种设置通常是全局通用的，不必在每次请求的时候都重新设置</span></span><br><span class="line"><span class="keyword">const</span> instance = axios.create(&#123;</span><br><span class="line">  timeout: <span class="number">3000</span>,</span><br><span class="line">  baseURL: <span class="string">'my-server.com/api/'</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+<h2 id="Promise-API"><a href="#Promise-API" class="headerlink" title="Promise API"></a>Promise API</h2><p>axios的请求操作都是使用Promise进行封装的，避免在执行先后操作时造成的“回调地狱”，同时也就意味着可以使用ES7的async/await语法进行修饰。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 比如说我要从第一个响应里取得id属性，将id的值放入第二个请求中，这是对执行顺序敏感的操作</span></span><br><span class="line">axios.get(<span class="string">'localhost/id'</span>)</span><br><span class="line">.then(<span class="function">(<span class="params">resp</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> axios.post(<span class="string">'localhost/list'</span>, &#123;</span><br><span class="line">    id: resp.data.id</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br><span class="line">.then(后续的操作)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 使用async/await修饰之后</span></span><br><span class="line"><span class="keyword">async</span> request () &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; id &#125; = <span class="keyword">await</span> axios.get(<span class="string">'localhost/id'</span>)</span><br><span class="line">  <span class="keyword">const</span> data = <span class="keyword">await</span> axios.post(<span class="string">'localhost/list'</span>, &#123; id &#125;)</span><br><span class="line">  <span class="comment">// 后续操作</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="请求合并"><a href="#请求合并" class="headerlink" title="请求合并"></a>请求合并</h2><p>上一节的需求是<strong>按顺序执行操作</strong>，还有一种情况是要求从多个接口获得数据，将数据组合后再使用。<br>比如说从category接口得到所有的目录，从news接口获得所有的新闻，根据新闻中的目录id，将新闻分类放到不同的目录下。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这部分是错误案例</span></span><br><span class="line">axios.get(<span class="string">'localhost/category'</span>)</span><br><span class="line">axios.get(<span class="string">'localhost/news'</span>)</span><br><span class="line"><span class="comment">// 如果将两个请求独立发送，由于操作是异步的，无法阻塞并且等待两个请求完成。</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">await</span> axios.get(<span class="string">'localhost/category'</span>)</span><br><span class="line"><span class="keyword">await</span> axios.get(<span class="string">'localhost/news'</span>)</span><br><span class="line"><span class="comment">// 如果使用async/await进行修饰，从结果上看能解决问题，但是这意味着category请求结束后才会执行news请求，耗费了两倍的时间</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 这部分是正确案例</span></span><br><span class="line">axios.all([</span><br><span class="line">  axios.get(<span class="string">'localhost/catrgory'</span>),</span><br><span class="line">  axios.get(<span class="string">'localhost/news'</span>)</span><br><span class="line">])</span><br><span class="line">.then(axios.spread(<span class="function">(<span class="params">resp1, resp2</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 后续操作</span></span><br><span class="line">&#125;))</span><br><span class="line"><span class="comment">// .then((respList) =&gt; &#123; 后续操作 &#125;)</span></span><br></pre></td></tr></table></figure>
+<p>首先，合并请求的意思是同时发起多个请求，在所有请求都响应后才执行then的操作，<strong>并不是将多个请求合成为一个</strong>。</p>
+<p>正确案例的写法是官方提供的，可以拆成两部分来看，实际上负责合并与收集结果的是all函数，如果不使用spread函数，在then中能得到一个<strong>由所有响应构成的列表</strong>。</p>
+<p>那么spread函数的用途就显而易见了，<del>他是一个高阶函数，将列表中的内容作为参数依次传递给wrapped函数</del>，简单来说就是<strong>把列表展开成回调函数参数</strong>，供开发者后续操作时使用的，可参考<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2F4aW9zL2F4aW9zL2Jsb2IvbWFzdGVyL2xpYi9oZWxwZXJzL3NwcmVhZC5qcw==" title="https://github.com/axios/axios/blob/master/lib/helpers/spread.js">源码中的注释<i class="fa fa-external-link"></i></span>。</p>
+<p>如果对Promise比较熟悉的话，看到all函数就会想到Promise中的all，事实上axios.all就是Promise.all，参考<span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL2F4aW9zL2F4aW9zL2Jsb2IvNDA1ZmU2OTBmOTMyNjRkNTkxYjdhNjRkMDA2MzE0ZTIyMjJjODcyNy9saWIvYXhpb3MuanMjTDQ1" title="https://github.com/axios/axios/blob/405fe690f93264d591b7a64d006314e2222c8727/lib/axios.js#L45">源码<i class="fa fa-external-link"></i></span>，所以<strong>直接使用Promise.all也是有效的</strong>：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Promise</span>.all([req1, req2]).then()</span><br></pre></td></tr></table></figure>
+<h2 id="拦截器"><a href="#拦截器" class="headerlink" title="拦截器"></a>拦截器</h2><p>拦截器是很重要的一个特性，他在HTTP请求的过程中提供了两个注入点，一个是发送请求前，另一个是接收响应后（还未执行后续操作）。</p>
+<h3 id="请求前"><a href="#请求前" class="headerlink" title="请求前"></a>请求前</h3><p>先说请求前这个注入点，在前后端分离的开发中，后端会提供API供前端使用，那么如何验证用户的身份呢？常用的方式有Cookies-Session，JWT等，主要是这个JWT，它将Token交给前端维护，每次访问需要授权的接口都得带上Token来表明自己的身份，由于这个Token是动态的，并且无法在项目初始化时获取，所以<strong>不能将它写入全局选项里</strong>。</p>
+<p>得先通过登陆之类的接口取得Token，之后在发送其他请求前将Token带入使用，这里就得用到请求前这个注入点了。</p>
+<h3 id="响应后"><a href="#响应后" class="headerlink" title="响应后"></a>响应后</h3><p>响应后这个注入点就比较关键了，接口的结构是固定的，比如：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  code: <span class="built_in">Number</span>,</span><br><span class="line">  message: <span class="built_in">String</span>,</span><br><span class="line">  data: <span class="built_in">Object</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>通过code来判断用户的请求是否执行成功，虽然每个接口成功与不成功的后续操作不一样，但总是能找出通用地方，比如错误原因为“未授权”的时候，要跳转到登录页面，或者发生错误时弹出提示通知用户。</p>
+<p>如果在每一次的响应都单独处理一遍这种情况，那肯定不利于维护，所以可以通过响应后这个注入点来做<strong>统一处理</strong>。</p>
+<h3 id="样例"><a href="#样例" class="headerlink" title="样例"></a>样例</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">axios.interceptors.request.use(<span class="function">(<span class="params">config</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">const</span> token = <span class="built_in">window</span>.localStorage.getItem(<span class="string">'token'</span>)</span><br><span class="line">  <span class="keyword">if</span> (!token) &#123;</span><br><span class="line">    router.push(<span class="string">'/login'</span>)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    config.data.headers[<span class="string">'Authorization'</span>] = <span class="string">`Bearer <span class="subst">$&#123;token&#125;</span>`</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> config</span><br><span class="line">&#125;, (error) =&gt; <span class="built_in">Promise</span>.reject(error))</span><br><span class="line"><span class="comment">// 这个config的类型为AxiosRequestConfig，这段代码的功能是在每次请求前从LocalStorage中取得token，如果token不存在，直接跳转登录页面，否则在请求头加入Token。</span></span><br><span class="line"><span class="comment">// 这里只能判断Token存不存在，无法判断Token是否有效，因为这是由后端判断的，不可能在每次发送请求前再发一个验证的请求，这样无疑会增加服务器的负担。</span></span><br><span class="line"></span><br><span class="line">instance.interceptors.response.use(<span class="function">(<span class="params">response</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// 请求成功的情况</span></span><br><span class="line">  <span class="keyword">if</span> (response.data.code === <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Promise</span>.resolve(response)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// Token无效的情况</span></span><br><span class="line">    <span class="keyword">if</span> (response.data.code === <span class="number">401</span>) &#123;</span><br><span class="line">      router.push(<span class="string">'/login'</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">Promise</span>.reject(response)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;,</span><br><span class="line">(error) =&gt; &#123;</span><br><span class="line">  <span class="comment">// 处理先前reject的情况，error为reject的参数</span></span><br><span class="line">  showToast(error.data.message)</span><br><span class="line">  <span class="keyword">return</span> <span class="built_in">Promise</span>.reject(error)</span><br><span class="line">&#125;)</span><br><span class="line"><span class="comment">// 这个response的类型为AxiosResponse，就是axios中的响应。</span></span><br><span class="line"><span class="comment">// 在请求拦截器中不做Token的校验也没有关系，因为无效的Token无法通过后端的验证，响应中的code肯定不为0，直接在响应拦截器中处理请求失败的情况就行了。</span></span><br></pre></td></tr></table></figure>
+<h2 id="请求取消"><a href="#请求取消" class="headerlink" title="请求取消"></a>请求取消</h2><p>之所以把这个特性放在最后，是因为它可能比较难理解，举个自动补全的例子，在搜索时打字，搜索框会给你补全剩余的内容，当然，不一定是每打一个字他都去请求补全结果的，这部分通常会使用<strong>去抖函数</strong>，但是用了去抖函数也会遇到一种情况：</p>
+<p><code>发起请求1 -&gt; 发起请求2 -&gt; 等待 -&gt; 接收响应2 -&gt; 接收响应1</code></p>
+<p>请求2完成的速度比请求1要快，好比说搜索一个“你好”，用户看到的补全是“你”的内容，在请求1和2之间增加延迟能降低这种问题发生的概率，但是同时也会拉低用户体验。</p>
+<p>所以为了有效解决这个问题，可以使用axios提供的请求取消特性。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 取得一个Cancel Token</span></span><br><span class="line"><span class="keyword">const</span> CancelToken = axios.CancelToken</span><br><span class="line"><span class="comment">// 通过已有的token得到控制源</span></span><br><span class="line"><span class="keyword">const</span> source = CancelToken.source()</span><br><span class="line"></span><br><span class="line">axios.get(<span class="string">'/user/12345'</span>, &#123;</span><br><span class="line">  <span class="comment">// 添加取消的标记</span></span><br><span class="line">  cancelToken: source.token</span><br><span class="line">&#125;).catch(<span class="function"><span class="keyword">function</span> (<span class="params">thrown</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 通过isCancel判断请求是被取消的，而不是发生了错误</span></span><br><span class="line">  <span class="keyword">if</span> (axios.isCancel(thrown)) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'Request canceled'</span>, thrown.message)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">// 处理发生错误的情况</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// post请求的例子</span></span><br><span class="line">axios.post(<span class="string">'/user/12345'</span>, &#123;</span><br><span class="line">  name: <span class="string">'new name'</span></span><br><span class="line">&#125;, &#123;</span><br><span class="line">  cancelToken: source.token</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 通过控制源取消请求</span></span><br><span class="line">source.cancel(<span class="string">'Operation canceled by the user.'</span>)</span><br></pre></td></tr></table></figure>
+<p>CancelToken是一个构造函数，<code>CancelToken.source()</code>创建了一个source实例，结构为<code>{ token, cancel }</code>，每一次调用<code>CancelToken.source()</code>，都会生成一个新的token和对应的cancel函数。</p>
+<p>由于生成的token和cancel是<strong>相对应的</strong>，所以使用token<strong>标记请求</strong>后，调用对应的cancel就能<strong>取消请求</strong>，在请求被取消之后会直接进入异常捕获环节，要区分<em>主动取消的请求</em>和<em>异常</em>可以使用<code>isCancel</code>函数。</p>
+<p>根据源码可以得知，在调用<code>cancel</code>取消请求后会创建<code>Cancel</code>对象作为参数resolve promise，<code>Cancel</code>对象中会设置<code>__CANCEL__</code>属性作为flag，<code>isCancel</code>函数就是通过这个属性来判断请求是否是被主动取消的。</p>
+<p><em>（请求的取消会使<code>CancelToken</code>的Promise resolve，请求前如果发现请求要取消，会将请求的Promise reject）</em></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/浅析/" rel="tag"># 浅析</a>
+          
+            <a href="/tags/HTTP/" rel="tag"># HTTP</a>
+          
+            <a href="/tags/模块/" rel="tag"># 模块</a>
+          
+            <a href="/tags/axios/" rel="tag"># axios</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/25/hello-world/" rel="next" title="Hello World">
+                <i class="fa fa-chevron-left"></i> Hello World
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/8306955?s=460&v=4" alt="Erioifpud">
+            
+              <p class="site-author-name" itemprop="name">Erioifpud</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL0VyaW9pZnB1ZA==" title="GitHub &rarr; https://github.com/Erioifpud"><i class="fa fa-fw fa-github"></i></span>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <span class="exturl" data-url="bWFpbHRvOmVyaW9pZnB1ZC5jbkBnbWFpbC5jb20=" title="E-Mail &rarr; mailto:erioifpud.cn@gmail.com"><i class="fa fa-fw fa-envelope"></i></span>
+                </span>
+              
+            </div>
+          
+
+          
+             <div class="cc-license motion-element" itemprop="license">
+              
+                
+              
+              
+              
+              <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></span>
+             </div>
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#基本用法"><span class="nav-number">1.1.</span> <span class="nav-text">基本用法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Promise-API"><span class="nav-number">1.2.</span> <span class="nav-text">Promise API</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#请求合并"><span class="nav-number">1.3.</span> <span class="nav-text">请求合并</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拦截器"><span class="nav-number">1.4.</span> <span class="nav-text">拦截器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#请求前"><span class="nav-number">1.4.1.</span> <span class="nav-text">请求前</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#响应后"><span class="nav-number">1.4.2.</span> <span class="nav-text">响应后</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#样例"><span class="nav-number">1.4.3.</span> <span class="nav-text">样例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#请求取消"><span class="nav-number">1.5.</span> <span class="nav-text">请求取消</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Erioifpud</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <span class="exturl theme-link" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <span class="exturl theme-link" data-url="aHR0cHM6Ly90aGVtZS1uZXh0Lm9yZw==">NexT.Gemini</span> v6.7.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=6.7.0"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=6.7.0"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+<script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+
+
+
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: true,
+    notify: false,
+    appId: 'yd5UduWAp5NDPPLcwbkMt3mr-gzGzoHsz',
+    appKey: 'cDTF4AyU1bxs1iJblUWCi8dt',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+</script>
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+      }
+      else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script>pangu.spacingPage();</script>
+
+
+  
+
+  
+  <script src="/js/src/exturl.js?v=6.7.0"></script>
+
+
+  
+
+  
+  <style>
+    .copy-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 20px;
+      color: #333;
+      white-space: nowrap;
+      vertical-align: middle;
+      cursor: pointer;
+      background-color: #eee;
+      background-image: linear-gradient(#fcfcfc, #eee);
+      border: 1px solid #d5d5d5;
+      border-radius: 3px;
+      user-select: none;
+      outline: 0;
+    }
+
+    .highlight-wrap .copy-btn {
+      transition: opacity .3s ease-in-out;
+      opacity: 0;
+      padding: 2px 6px;
+      position: absolute;
+      right: 4px;
+      top: 8px;
+    }
+
+    .highlight-wrap:hover .copy-btn,
+    .highlight-wrap .copy-btn:focus {
+      opacity: 1
+    }
+
+    .highlight-wrap {
+      position: relative;
+    }
+  </style>
+  <script>
+    $('.highlight').each(function(i, e) {
+      var $wrap = $('<div>').addClass('highlight-wrap');
+      $(e).after($wrap);
+      $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+        var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+          return $(e).text();
+        }).toArray().join('\n');
+        var ta = document.createElement('textarea');
+        var range = document.createRange(); //For Chrome
+        var sel = window.getSelection(); //For Chrome
+        var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+        ta.style.top = yPosition + 'px'; //Prevent page scroll
+        ta.style.position = 'absolute';
+        ta.style.opacity = '0';
+        ta.value = code;
+        ta.textContent = code; //For FireFox
+        ta.contentEditable = true;
+        ta.readOnly = false;
+        document.body.appendChild(ta);
+        range.selectNode(ta);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        ta.setSelectionRange(0, code.length);
+        var result = document.execCommand('copy');
+        
+          if (result) $(this).text('复制成功');
+          else $(this).text('复制失败');
+        
+        ta.blur(); //For iOS
+        $(this).blur();
+      })).on('mouseleave', function(e) {
+        var $b = $(this).find('.copy-btn');
+        setTimeout(function() {
+          $b.text('复制');
+        }, 300);
+      }).append(e);
+    })
+  </script>
+
+
+  
+
+</body>
+</html>
