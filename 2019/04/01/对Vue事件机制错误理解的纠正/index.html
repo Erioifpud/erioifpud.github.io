@@ -103,25 +103,25 @@
 
 
 
-  <meta name="description" content="你已经是一个成熟的组件了，应该学会去渲染其他组件。  概述这个组件的功能类似于codepen，jsfiddle等，也就是代码的即时预览，能读取vue单文件组件的代码，并根据代码创建组件实例，对组件进行渲染。 DEMO地址(Sandbox) 实现单页面组件的结构由template、script与style三种元素组成，所以首先得将这三块分离，再进行实例化、组合等操作。 获取元素内容元素标签的格式为">
-<meta name="keywords" content="Vue,组件,测试">
+  <meta name="description" content="如果你觉得\$emit发出事件能在父组件中使用\$on捕获，那我觉得你应该看下去。  先说结论，\$emit只会在当前实例触发事件，\$on只会捕获当前实例的事件。 on和emit的运行机制先看一段源代码：1234567891011121314Vue.prototype.$emit = function (event) &amp;#123;  var vm = this;  // 省略对事件名称格式的判">
+<meta name="keywords" content="Vue,浅析">
 <meta property="og:type" content="article">
-<meta property="og:title" content="关于动态渲染Vue组件的组件">
-<meta property="og:url" content="http://erioifpud.github.io/2019/02/08/关于动态渲染Vue组件的组件/index.html">
+<meta property="og:title" content="对Vue事件机制错误理解的纠正">
+<meta property="og:url" content="http://erioifpud.github.io/2019/04/01/对Vue事件机制错误理解的纠正/index.html">
 <meta property="og:site_name" content="Erioifpud">
-<meta property="og:description" content="你已经是一个成熟的组件了，应该学会去渲染其他组件。  概述这个组件的功能类似于codepen，jsfiddle等，也就是代码的即时预览，能读取vue单文件组件的代码，并根据代码创建组件实例，对组件进行渲染。 DEMO地址(Sandbox) 实现单页面组件的结构由template、script与style三种元素组成，所以首先得将这三块分离，再进行实例化、组合等操作。 获取元素内容元素标签的格式为">
+<meta property="og:description" content="如果你觉得\$emit发出事件能在父组件中使用\$on捕获，那我觉得你应该看下去。  先说结论，\$emit只会在当前实例触发事件，\$on只会捕获当前实例的事件。 on和emit的运行机制先看一段源代码：1234567891011121314Vue.prototype.$emit = function (event) &amp;#123;  var vm = this;  // 省略对事件名称格式的判">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-02-09T07:15:49.096Z">
+<meta property="og:updated_time" content="2019-04-01T19:15:17.100Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="关于动态渲染Vue组件的组件">
-<meta name="twitter:description" content="你已经是一个成熟的组件了，应该学会去渲染其他组件。  概述这个组件的功能类似于codepen，jsfiddle等，也就是代码的即时预览，能读取vue单文件组件的代码，并根据代码创建组件实例，对组件进行渲染。 DEMO地址(Sandbox) 实现单页面组件的结构由template、script与style三种元素组成，所以首先得将这三块分离，再进行实例化、组合等操作。 获取元素内容元素标签的格式为">
+<meta name="twitter:title" content="对Vue事件机制错误理解的纠正">
+<meta name="twitter:description" content="如果你觉得\$emit发出事件能在父组件中使用\$on捕获，那我觉得你应该看下去。  先说结论，\$emit只会在当前实例触发事件，\$on只会捕获当前实例的事件。 on和emit的运行机制先看一段源代码：1234567891011121314Vue.prototype.$emit = function (event) &amp;#123;  var vm = this;  // 省略对事件名称格式的判">
 
 
 
 
 
 
-  <link rel="canonical" href="http://erioifpud.github.io/2019/02/08/关于动态渲染Vue组件的组件/">
+  <link rel="canonical" href="http://erioifpud.github.io/2019/04/01/对Vue事件机制错误理解的纠正/">
 
 
 
@@ -131,7 +131,7 @@
   };
 </script>
 
-  <title>关于动态渲染Vue组件的组件 | Erioifpud</title>
+  <title>对Vue事件机制错误理解的纠正 | Erioifpud</title>
   
 
 
@@ -330,7 +330,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://erioifpud.github.io/2019/02/08/关于动态渲染Vue组件的组件/">
+    <link itemprop="mainEntityOfPage" href="http://erioifpud.github.io/2019/04/01/对Vue事件机制错误理解的纠正/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Erioifpud">
@@ -347,7 +347,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">关于动态渲染Vue组件的组件
+          <h2 class="post-title" itemprop="name headline">对Vue事件机制错误理解的纠正
 
               
             
@@ -373,7 +373,7 @@
                 
               
 
-              <time title="创建时间：2019-02-08 03:32:55" itemprop="dateCreated datePublished" datetime="2019-02-08T03:32:55+08:00">2019-02-08</time>
+              <time title="创建时间：2019-04-01 02:09:40" itemprop="dateCreated datePublished" datetime="2019-04-01T02:09:40+08:00">2019-04-01</time>
             
 
             
@@ -390,7 +390,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-02-09 15:15:49" itemprop="dateModified" datetime="2019-02-09T15:15:49+08:00">2019-02-09</time>
+                <time title="修改时间：2019-04-02 03:15:17" itemprop="dateModified" datetime="2019-04-02T03:15:17+08:00">2019-04-02</time>
               
             
           </span>
@@ -407,8 +407,8 @@
                   <i class="fa fa-comment-o"></i>
                 </span>
             
-                <a href="/2019/02/08/关于动态渲染Vue组件的组件/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2019/02/08/关于动态渲染Vue组件的组件/" itemprop="commentCount"></span>
+                <a href="/2019/04/01/对Vue事件机制错误理解的纠正/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2019/04/01/对Vue事件机制错误理解的纠正/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -430,7 +430,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">2.5k</span>
+                <span title="本文字数">2k</span>
               
 
               
@@ -465,22 +465,27 @@
 
       
         <blockquote>
-<p>你已经是一个成熟的组件了，应该学会去渲染其他组件。</p>
+<p>如果你觉得\$emit发出事件能在父组件中使用\$on捕获，那我觉得你应该看下去。</p>
 </blockquote>
-<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>这个组件的功能类似于codepen，jsfiddle等，也就是代码的即时预览，能读取vue单文件组件的代码，并根据代码创建组件实例，对组件进行渲染。</p>
-<p><span class="exturl" data-url="aHR0cHM6Ly9raW5kLXdlc2NvZmYtYzZhZGE4Lm5ldGxpZnkuY29tLw==" title="https://kind-wescoff-c6ada8.netlify.com/">DEMO地址(Sandbox)<i class="fa fa-external-link"></i></span></p>
-<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><p>单页面组件的结构由<code>template</code>、<code>script</code>与<code>style</code>三种元素组成，所以首先得将这三块分离，再进行实例化、组合等操作。</p>
-<h2 id="获取元素内容"><a href="#获取元素内容" class="headerlink" title="获取元素内容"></a>获取元素内容</h2><p>元素标签的格式为<code>&lt;name key=&quot;value&quot; key&gt;</code>的形式，在这里我们不需要获取<code>key</code>和<code>value</code>，只需要辨认出三种元素就行了，因为我们需要获取的是<strong>元素标签括起来的内容</strong>，标签本身是不需要的。</p>
-<p>这里可以用正则表达式解决，<code>&lt;元素名[^&gt;]*&gt;</code>这一段正则将会匹配任意元素的起始标签，<code>[^&gt;]*</code>表示不为<code>&gt;</code>的任意多个（零次或以上）字符，可以完美处理<code>&lt;style&gt;</code>或<code>&lt;style scoped&gt;</code>情况。</p>
-<iframe frameborder="0" width="342" height="157" src="https://jex.im/regulex/#!embed=true&flags=&re=%3Cstyle%5B%5E%3E%5D*%3E"></iframe>
-
-<p>在获取起始标签的位置后，从标签结尾开始进行<code>slice</code>，直到<code>&lt;/style&gt;</code>结束，得到的就是元素标签的内容，代码如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">getContent (code, tag) &#123;</span><br><span class="line">  <span class="keyword">const</span> startRegex = <span class="keyword">new</span> <span class="built_in">RegExp</span>(<span class="string">`&lt;<span class="subst">$&#123;tag&#125;</span>[^&gt;]*&gt;`</span>)</span><br><span class="line">  <span class="keyword">let</span> startTag = code.match(startRegex)</span><br><span class="line">  <span class="keyword">if</span> (!startTag) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="string">''</span></span><br><span class="line">  &#125;</span><br><span class="line">  startTag = startTag[<span class="number">0</span>]</span><br><span class="line">  <span class="keyword">const</span> startPos = code.indexOf(startTag)</span><br><span class="line">  <span class="keyword">return</span> code.slice(startPos + startTag.length, code.indexOf(<span class="string">`&lt;/<span class="subst">$&#123;tag&#125;</span>&gt;`</span>))</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">this</span>.getContent(<span class="keyword">this</span>.vue, <span class="string">'template'</span>)</span><br><span class="line"><span class="keyword">this</span>.getContent(<span class="keyword">this</span>.vue, <span class="string">'script'</span>)</span><br><span class="line"><span class="keyword">this</span>.getContent(<span class="keyword">this</span>.vue, <span class="string">'style'</span>)</span><br></pre></td></tr></table></figure></p>
-<h2 id="实例化组件"><a href="#实例化组件" class="headerlink" title="实例化组件"></a>实例化组件</h2><p>由于要渲染的目标是vue组件，现在得到了三部分的代码，因此可以将template与script整合成vue options的形式，交由<code>Vue.extends</code>进行组件实例化，options的结构大概是这样的：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  template: <span class="built_in">String</span>,</span><br><span class="line">  data () &#123;</span><br><span class="line">    <span class="keyword">return</span> &#123;&#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  props: <span class="built_in">Object</span></span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>实际上就是vue的<strong>非单文件写法</strong>，可以参考官方文档。这里可以看得出，只要将先前获取的template与script内容结合，就能组合出options。</p>
-<p>template和script的内容都是字符串，template能直接放入options中，而script需要<strong>反序列化成一个对象</strong>。</p>
-<p>这里使用<code>new Function</code>对script代码进行反序列化，<code>new Function</code><strong>接受n个参数构造一个函数</strong>，前n-1个参数被视作<strong>函数的参数</strong>，第n个参数为<strong>函数的内容</strong>，为了将文本形式的对象转化成对象，可以写成<code>return 文本对象</code>的形式。<br>由于script部分通常使用<code>export default</code>进行导出，我们可以将<code>export default</code>替换成<code>return</code>作为函数的内容。<br>（不使用<code>JSON.parse</code>的原因是文本形式的对象并不是JSON的形式的，格式不符，所以需要通过<code>new Function</code>或<code>eval</code>去动态执行代码，得到对象）</p>
-<p>接着使用<code>Vue.extend(options)</code>根据options创建出<strong>组件的构造方法</strong>，使用<code>new Component().$mount()</code>挂载组件后得到的就是组件的实例，最后将实例的$el插入DOM中就完成了组件的实例化与挂载，代码如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!<span class="keyword">this</span>.template || !<span class="keyword">this</span>.script) &#123;</span><br><span class="line">  <span class="keyword">return</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 将文本形式的代码转换为options对象</span></span><br><span class="line"><span class="keyword">const</span> options = <span class="keyword">new</span> <span class="built_in">Function</span>(<span class="string">`<span class="subst">$&#123;<span class="keyword">this</span>.script.replace(<span class="string">'export default'</span>, <span class="string">'return '</span>)&#125;</span>`</span>)()</span><br><span class="line"><span class="comment">// 将template存入options中</span></span><br><span class="line">options.template = <span class="keyword">this</span>.template</span><br><span class="line"><span class="comment">// 生成组件构造函数</span></span><br><span class="line"><span class="keyword">const</span> Component = Vue.extend(options)</span><br><span class="line"><span class="comment">// 通过构造函数创建组件实例并挂载</span></span><br><span class="line"><span class="keyword">const</span> component = <span class="keyword">new</span> Component().$mount()</span><br><span class="line"><span class="keyword">this</span>.component = component</span><br><span class="line"><span class="comment">// 将组件的元素对象$el插入DOM中</span></span><br><span class="line"><span class="keyword">this</span>.$el.appendChild(<span class="keyword">this</span>.component.$el)</span><br></pre></td></tr></table></figure></p>
-<h1 id="样式的绑定"><a href="#样式的绑定" class="headerlink" title="样式的绑定"></a>样式的绑定</h1><p>style的内容为css代码，可以通过创建style元素直接使用代码，并将元素放入head中，为了在更新组件样式时避免样式冲突，应该移除先前的样式元素，所以需要给样式元素添加一个唯一的id，使用<code>watch</code>监听代码的变化，发生变动时先移除已有样式，再添加新样式并重新生成id。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> elem = <span class="built_in">document</span>.createElement(<span class="string">'style'</span>)</span><br><span class="line">elem.type = <span class="string">'text/css'</span></span><br><span class="line"><span class="comment">// 得到随机id</span></span><br><span class="line"><span class="keyword">this</span>.id = <span class="built_in">Math</span>.random().toString(<span class="number">36</span>).substring(<span class="number">7</span>)</span><br><span class="line">elem.id = <span class="keyword">this</span>.id</span><br><span class="line"><span class="comment">// 通过先前获取的样式创建style元素</span></span><br><span class="line">elem.innerHTML = <span class="keyword">this</span>.style</span><br><span class="line"><span class="built_in">document</span>.head.appendChild(elem)</span><br></pre></td></tr></table></figure></p>
+<p>先说结论，<strong>\$emit只会在当前实例触发事件，\$on只会捕获当前实例的事件</strong>。</p>
+<h1 id="on和emit的运行机制"><a href="#on和emit的运行机制" class="headerlink" title="on和emit的运行机制"></a>on和emit的运行机制</h1><p>先看一段源代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Vue.prototype.$emit = <span class="function"><span class="keyword">function</span> (<span class="params">event</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> vm = <span class="keyword">this</span>;</span><br><span class="line">  <span class="comment">// 省略对事件名称格式的判断</span></span><br><span class="line">  <span class="keyword">var</span> cbs = vm._events[event];</span><br><span class="line">  <span class="keyword">if</span> (cbs) &#123;</span><br><span class="line">    cbs = cbs.length &gt; <span class="number">1</span> ? toArray(cbs) : cbs;</span><br><span class="line">    <span class="keyword">var</span> args = toArray(<span class="built_in">arguments</span>, <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">var</span> info = <span class="string">"event handler for \""</span> + event + <span class="string">"\""</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, l = cbs.length; i &lt; l; i++) &#123;</span><br><span class="line">      invokeWithErrorHandling(cbs[i], vm, args, vm, info);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> vm</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>这是<code>$emit</code>函数的实现，首先是通过事件名event在<code>_events</code>属性中找到<strong>事件的回调函数</strong>，如果回调函数存在，那么就执行回调函数。</p>
+<p>在这个过程中vm为this，也就是说在组件中使用<code>this.$emit()</code>的时候，<strong>vm是指向组件本身的</strong>。</p>
+<p>那么<code>_events</code>属性是从哪来的呢？接着看一段<code>$on</code>的源代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Vue.prototype.$on = <span class="function"><span class="keyword">function</span> (<span class="params">event, fn</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> vm = <span class="keyword">this</span>;</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">Array</span>.isArray(event)) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, l = event.length; i &lt; l; i++) &#123;</span><br><span class="line">      vm.$on(event[i], fn);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    (vm._events[event] || (vm._events[event] = [])).push(fn);</span><br><span class="line">    <span class="comment">// optimize hook:event cost by using a boolean flag marked at registration</span></span><br><span class="line">    <span class="comment">// instead of a hash lookup</span></span><br><span class="line">    <span class="keyword">if</span> (hookRE.test(event)) &#123;</span><br><span class="line">      vm._hasHookEvent = <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> vm</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>关键在else块中的第一行，当调用<code>$on</code>函数时，会将事件名event作为一个<em>键</em>，放入<code>_events</code>对象中，值为回调函数组成的数组（由于可以多次使用<code>$on</code>注册事件回调，所以回调函数都会被存入数组中，按注册顺序执行）。</p>
+<h2 id="概括"><a href="#概括" class="headerlink" title="概括"></a>概括</h2><p><code>$on</code>注册的回调函数会被放入<strong>当前实例vm</strong>的<code>_events</code>对象中，<code>$emit</code>会在<strong>当前实例vm</strong>的<code>_events</code>对象中找事件的回调函数去执行。</p>
+<p>所以<code>$emit</code>和<code>$on</code>这两个函数涉及的对象都是vm，和父组件毫无关系。</p>
+<h1 id="关于v-on"><a href="#关于v-on" class="headerlink" title="关于v-on"></a>关于v-on</h1><p>首先，<code>v-on</code>指令是放在元素或组件中的，在指令的定义函数中的<code>el</code>是属于<strong>当前组件或元素</strong>的，这没毛病。</p>
+<p><code>v-on:click=&quot;handleClick&quot;</code>这种写法会将<code>handleClick</code>函数作为<code>binding.value</code>传给指令定义函数，这也没毛病。</p>
+<blockquote>
+<p>父级模板里的所有内容都是在父级作用域中编译的；子模板里的所有内容都是在子作用域中编译的。</p>
+</blockquote>
+<p>这是官方文档里的话，那么现在组件parent的模版是这样的：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">child</span> <span class="attr">v-on:click</span>=<span class="string">"handleClick"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>这是组件parent的模版，那很明显这里的<code>handleClick</code>函数是来自于<strong>组件parent</strong>的（使用parent的作用域），组件child上的<code>v-on:click</code>会监听child的事件（因为el来自于v-on挂载的组件），所以<code>v-on:click=&quot;handleClick&quot;</code>这个语句的意思实际上是：</p>
+<blockquote>
+<p>监听child组件上的click事件，触发事件后调用parent提供的handleClick函数（listener是在组件child上的）</p>
+</blockquote>
+<p><del>而不应该被理解成组件parent去监听child的click事件，满足条件就触发handleClick。</del></p>
 
       
     </div>
@@ -506,9 +511,7 @@
           
             <a href="/tags/Vue/" rel="tag"># Vue</a>
           
-            <a href="/tags/组件/" rel="tag"># 组件</a>
-          
-            <a href="/tags/测试/" rel="tag"># 测试</a>
+            <a href="/tags/浅析/" rel="tag"># 浅析</a>
           
         </div>
       
@@ -521,8 +524,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/02/01/Vue组件即时预览工具的雏形/" rel="next" title="Vue组件即时预览工具的雏形">
-                <i class="fa fa-chevron-left"></i> Vue组件即时预览工具的雏形
+              <a href="/2019/03/25/Vue组件-平滑滚动面板/" rel="next" title="Vue组件 - 平滑滚动面板">
+                <i class="fa fa-chevron-left"></i> Vue组件 - 平滑滚动面板
               </a>
             
           </div>
@@ -530,10 +533,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/03/25/Vue组件-平滑滚动面板/" rel="prev" title="Vue组件 - 平滑滚动面板">
-                Vue组件 - 平滑滚动面板 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -705,7 +704,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实现"><span class="nav-number">2.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#获取元素内容"><span class="nav-number">2.1.</span> <span class="nav-text">获取元素内容</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例化组件"><span class="nav-number">2.2.</span> <span class="nav-text">实例化组件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#样式的绑定"><span class="nav-number">3.</span> <span class="nav-text">样式的绑定</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#on和emit的运行机制"><span class="nav-number">1.</span> <span class="nav-text">on和emit的运行机制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#概括"><span class="nav-number">1.1.</span> <span class="nav-text">概括</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于v-on"><span class="nav-number">2.</span> <span class="nav-text">关于v-on</span></a></li></ol></div>
             
 
           </div>
