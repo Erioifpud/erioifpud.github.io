@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.7.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="概述对过长的列表内容优化的方法之一是将看不见的项目隐藏，要实现这个需求必须先判断元素是否可见，判断的方式有多种，大致上可以分成通用的和方便的。 在分析这个问题之前，先得了解元素尺寸相关的属性，本文将从基础开始讲解。 尺寸相关属性尺寸属性可以大致分成三类，分别是 offset、client 和 scroll，每一个元素都有这 3 种尺寸属性，每一种的意义都不一样。 offsetoffset 多和 o">
+<meta name="keywords" content="JavaScript,HTML">
+<meta property="og:type" content="article">
+<meta property="og:title" content="判断元素是否在可视区域内">
+<meta property="og:url" content="http://erioifpud.github.io/2019/06/14/判断元素是否在可视区域内/index.html">
+<meta property="og:site_name" content="Erioifpud">
+<meta property="og:description" content="概述对过长的列表内容优化的方法之一是将看不见的项目隐藏，要实现这个需求必须先判断元素是否可见，判断的方式有多种，大致上可以分成通用的和方便的。 在分析这个问题之前，先得了解元素尺寸相关的属性，本文将从基础开始讲解。 尺寸相关属性尺寸属性可以大致分成三类，分别是 offset、client 和 scroll，每一个元素都有这 3 种尺寸属性，每一种的意义都不一样。 offsetoffset 多和 o">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://i.loli.net/2019/06/14/5d0376dd6558d94494.png">
+<meta property="og:updated_time" content="2019-06-18T08:53:02.366Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="判断元素是否在可视区域内">
+<meta name="twitter:description" content="概述对过长的列表内容优化的方法之一是将看不见的项目隐藏，要实现这个需求必须先判断元素是否可见，判断的方式有多种，大致上可以分成通用的和方便的。 在分析这个问题之前，先得了解元素尺寸相关的属性，本文将从基础开始讲解。 尺寸相关属性尺寸属性可以大致分成三类，分别是 offset、client 和 scroll，每一个元素都有这 3 种尺寸属性，每一种的意义都不一样。 offsetoffset 多和 o">
+<meta name="twitter:image" content="https://i.loli.net/2019/06/14/5d0376dd6558d94494.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://erioifpud.github.io/2019/06/14/判断元素是否在可视区域内/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>判断元素是否在可视区域内 | Erioifpud</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Erioifpud</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/404/" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>404</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://erioifpud.github.io/2019/06/14/判断元素是否在可视区域内/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Erioifpud">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/8306955?s=460&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Erioifpud">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">判断元素是否在可视区域内
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-06-14 18:14:04" itemprop="dateCreated datePublished" datetime="2019-06-14T18:14:04+08:00">2019-06-14</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-06-18 16:53:02" itemprop="dateModified" datetime="2019-06-18T16:53:02+08:00">2019-06-18</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <a href="/2019/06/14/判断元素是否在可视区域内/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2019/06/14/判断元素是否在可视区域内/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">2.3k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">2 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>对过长的列表内容优化的方法之一是<strong>将看不见的项目隐藏</strong>，要实现这个需求必须<strong>先判断元素是否可见</strong>，判断的方式有多种，大致上可以分成<strong>通用的</strong>和<strong>方便的</strong>。</p>
+<p>在分析这个问题之前，先得了解<strong>元素尺寸相关的属性</strong>，本文将从基础开始讲解。</p>
+<h1 id="尺寸相关属性"><a href="#尺寸相关属性" class="headerlink" title="尺寸相关属性"></a>尺寸相关属性</h1><p>尺寸属性可以大致分成三类，分别是 offset、client 和 scroll，每一个元素都有这 3 种尺寸属性，每一种的意义都不一样。</p>
+<h2 id="offset"><a href="#offset" class="headerlink" title="offset"></a>offset</h2><p>offset 多和 <code>offsetParent</code> 相关联，<code>offsetParent</code> 指的是<strong>离该元素最近的外层已定位元素</strong>（后文简称”<strong><u>定位元素</u></strong>“），若是不存在这样的外层元素，则指向 body。</p>
+<h3 id="offsetTop"><a href="#offsetTop" class="headerlink" title="offsetTop"></a>offsetTop</h3><p>指的是该元素与<strong><u>定位元素</u></strong>在垂直方向上的距离，是从<strong>定位元素的边框内部到该元素的边框外部</strong>，也就是说相当于定位元素的 <code>padding-top</code> 加上该元素的 <code>margin-top</code>。</p>
+<p>要注意的是这个属性是<strong>不会改变</strong>的，即使该元素被滚动到容器外，取值也不会有变化。</p>
+<h3 id="offsetLeft"><a href="#offsetLeft" class="headerlink" title="offsetLeft"></a>offsetLeft</h3><p>和 <code>offsetTop</code> 类似，指的是该元素与<strong><u>定位元素</u></strong>在<strong>水平方向</strong>上的距离，是从<strong>定位元素的边框内部到该元素的边框外部</strong>，也就是说相当于定位元素的 <code>padding-left</code> 加上该元素的 <code>margin-left</code>。</p>
+<p>同样不会被改变。</p>
+<h3 id="offsetWidth"><a href="#offsetWidth" class="headerlink" title="offsetWidth"></a>offsetWidth</h3><p>这个倒是和<strong><u>定位元素</u></strong>没什么关系，指的是该元素从 <code>border-left</code> 到 <code>border-right</code> 的距离，包括了 padding 和 content 的宽度。</p>
+<h3 id="offsetHeight"><a href="#offsetHeight" class="headerlink" title="offsetHeight"></a>offsetHeight</h3><p>同理，这个指的是该元素从 <code>border-top</code> 到 <code>border-bottom</code> 的距离，包括了 padding 和 content 的高度。</p>
+<p>##client</p>
+<p>client 指的多是<strong>元素本身可见部分（border、padding 和 content）</strong>，在<strong>左右边框宽度相等的前提</strong>下，<code>clientLeft * 2 + clientWidth === 元素可见部分宽度</code>。</p>
+<h3 id="clientTop"><a href="#clientTop" class="headerlink" title="clientTop"></a>clientTop</h3><p>指的是该元素 <code>border-top</code> 的高度。</p>
+<h3 id="clientLeft"><a href="#clientLeft" class="headerlink" title="clientLeft"></a>clientLeft</h3><p>指的是该元素 <code>border-left</code> 的宽度。</p>
+<h3 id="clientWidth"><a href="#clientWidth" class="headerlink" title="clientWidth"></a>clientWidth</h3><p>指的是该元素 padding 和 content 的<strong>宽度总和</strong>。</p>
+<h3 id="clientHeight"><a href="#clientHeight" class="headerlink" title="clientHeight"></a>clientHeight</h3><p>指的是该元素 padding 和 content 的<strong>高度总和</strong>。</p>
+<h2 id="scroll"><a href="#scroll" class="headerlink" title="scroll"></a>scroll</h2><p>scroll 指的多是和滚动相关的尺寸。</p>
+<h3 id="scrollTop"><a href="#scrollTop" class="headerlink" title="scrollTop"></a>scrollTop</h3><p>指的是该元素的上方滚动的距离，简单来说就是<strong>上方隐藏区域的高度</strong>，如果没有滚动或不存在滚动条，那么值就是0。</p>
+<p>要注意的是，这个的取值是<strong>会随着滚动的距离发生变化</strong>的。</p>
+<h3 id="scrollLeft"><a href="#scrollLeft" class="headerlink" title="scrollLeft"></a>scrollLeft</h3><p>指的是该元素的左方滚动的距离，简单来说就是<strong>左方隐藏区域的高度</strong>，如果没有滚动或不存在滚动条，那么值就是0。</p>
+<p>同样会发生变化。</p>
+<h3 id="scrollWidth"><a href="#scrollWidth" class="headerlink" title="scrollWidth"></a>scrollWidth</h3><p>指的是元素的<strong>真实宽度</strong>，也就是<strong>算上了左右两侧滚动区内容</strong>的宽度。</p>
+<h3 id="scrollHeight"><a href="#scrollHeight" class="headerlink" title="scrollHeight"></a>scrollHeight</h3><p>指的是元素的<strong>真实高度</strong>，也就是<strong>算上了左右两侧滚动区内容</strong>的高度。</p>
+<h2 id="一图总结"><a href="#一图总结" class="headerlink" title="一图总结"></a>一图总结</h2><p><img src="https://i.loli.net/2019/06/14/5d0376dd6558d94494.png" alt="WX20190614-182830@2x.png"></p>
+<h1 id="判断可视区域"><a href="#判断可视区域" class="headerlink" title="判断可视区域"></a>判断可视区域</h1><p>判断的方法有多种，首先是基于尺寸相关属性的判断方法。</p>
+<p>由于 <code>offsetTop</code> 是不变的，所以无法直接通过它来取得元素当前的位置，判断元素有没有出上边缘可以通过 <code>el.offsetTop - container.scrollTop</code> 进行，因为 <code>offsetTop</code> 记录了元素与容器的<strong>初始相距距离</strong>，<code>scrollTop</code> 反映了容器上方滚动出去的高度，相减后结果<strong>大于</strong> <code>-el.clientHeight</code> 时可以判断出元素还<strong>有一部分处在容器内</strong>。</p>
+<p>下边缘也能通过同样的方式去判断，元素的相距距离减去容器的滚动高度，结果<strong>小于</strong>容器的 <code>clientHeight</code> 时那么说明元素一定在<strong>容器下边框的上方</strong>。</p>
+<p>结合两个条件可以得到一个判断方式：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> elOffsetTop = el.offsetTop</span><br><span class="line"><span class="keyword">const</span> containerScrollTop = container.scrollTop</span><br><span class="line"><span class="keyword">const</span> elClientHeight = el.clientHeight</span><br><span class="line"><span class="keyword">const</span> containerClientHeight = container.clientHeight</span><br><span class="line"><span class="keyword">const</span> elPosY = elOffsetTop - containerScrollTop</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (elPosY &lt; containerClientHeigt &amp;&amp; elPosY &gt; -elClientHeight) &#123;</span><br><span class="line">  <span class="comment">// 处在容器的可视范围内</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个方式比较通用，因为这些属性都是浏览器早期就支持的，但是要注意<strong>重排</strong>的问题，这里多次访问元素的位置属性，会造成多次重排。</p>
+<p>第二种方法是使用现成的 <code>IntersectionObserver</code> API，这个 API 是后续才加入浏览器中的，所以对于一些早期的浏览器可能兼容性不高，但论使用时的复杂程度，这个 API 要比前一个方法简单：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> io = <span class="keyword">new</span> IntersectionObserver(<span class="function"><span class="params">entries</span> =&gt;</span> &#123;</span><br><span class="line">  entries.forEach(<span class="function"><span class="params">entry</span> =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (entry.intersectionRatio &gt; <span class="number">0</span>) &#123;</span><br><span class="line">      <span class="comment">// 处在容器的可视范围内</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">io.observe(el)</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
+          
+            <a href="/tags/HTML/" rel="tag"># HTML</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/01/关于函数的Wrapper/" rel="next" title="关于函数的Wrapper">
+                <i class="fa fa-chevron-left"></i> 关于函数的Wrapper
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/06/15/关于Vue-Function-based-API/" rel="prev" title="关于Vue Function-based API">
+                关于Vue Function-based API <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/8306955?s=460&v=4" alt="Erioifpud">
+            
+              <p class="site-author-name" itemprop="name">Erioifpud</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">14</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL0VyaW9pZnB1ZA==" title="GitHub &rarr; https://github.com/Erioifpud"><i class="fa fa-fw fa-github"></i></span>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <span class="exturl" data-url="bWFpbHRvOmVyaW9pZnB1ZC5jbkBnbWFpbC5jb20=" title="E-Mail &rarr; mailto:erioifpud.cn@gmail.com"><i class="fa fa-fw fa-envelope"></i></span>
+                </span>
+              
+            </div>
+          
+
+          
+             <div class="cc-license motion-element" itemprop="license">
+              
+                
+              
+              
+              
+              <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></span>
+             </div>
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#尺寸相关属性"><span class="nav-number">2.</span> <span class="nav-text">尺寸相关属性</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#offset"><span class="nav-number">2.1.</span> <span class="nav-text">offset</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#offsetTop"><span class="nav-number">2.1.1.</span> <span class="nav-text">offsetTop</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#offsetLeft"><span class="nav-number">2.1.2.</span> <span class="nav-text">offsetLeft</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#offsetWidth"><span class="nav-number">2.1.3.</span> <span class="nav-text">offsetWidth</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#offsetHeight"><span class="nav-number">2.1.4.</span> <span class="nav-text">offsetHeight</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#clientTop"><span class="nav-number">2.1.5.</span> <span class="nav-text">clientTop</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#clientLeft"><span class="nav-number">2.1.6.</span> <span class="nav-text">clientLeft</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#clientWidth"><span class="nav-number">2.1.7.</span> <span class="nav-text">clientWidth</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#clientHeight"><span class="nav-number">2.1.8.</span> <span class="nav-text">clientHeight</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#scroll"><span class="nav-number">2.2.</span> <span class="nav-text">scroll</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#scrollTop"><span class="nav-number">2.2.1.</span> <span class="nav-text">scrollTop</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#scrollLeft"><span class="nav-number">2.2.2.</span> <span class="nav-text">scrollLeft</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#scrollWidth"><span class="nav-number">2.2.3.</span> <span class="nav-text">scrollWidth</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#scrollHeight"><span class="nav-number">2.2.4.</span> <span class="nav-text">scrollHeight</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一图总结"><span class="nav-number">2.3.</span> <span class="nav-text">一图总结</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#判断可视区域"><span class="nav-number">3.</span> <span class="nav-text">判断可视区域</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Erioifpud</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+    <span title="站点总字数">24k</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+    <span title="站点阅读时长">22 分钟</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <span class="exturl theme-link" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <span class="exturl theme-link" data-url="aHR0cHM6Ly90aGVtZS1uZXh0Lm9yZw==">NexT.Gemini</span> v6.7.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=6.7.0"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=6.7.0"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+<script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+
+
+
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: true,
+    notify: false,
+    appId: 'yd5UduWAp5NDPPLcwbkMt3mr-gzGzoHsz',
+    appKey: 'cDTF4AyU1bxs1iJblUWCi8dt',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+</script>
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+      }
+      else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script>pangu.spacingPage();</script>
+
+
+  
+
+  
+  <script src="/js/src/exturl.js?v=6.7.0"></script>
+
+
+  
+
+  
+  <style>
+    .copy-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 20px;
+      color: #333;
+      white-space: nowrap;
+      vertical-align: middle;
+      cursor: pointer;
+      background-color: #eee;
+      background-image: linear-gradient(#fcfcfc, #eee);
+      border: 1px solid #d5d5d5;
+      border-radius: 3px;
+      user-select: none;
+      outline: 0;
+    }
+
+    .highlight-wrap .copy-btn {
+      transition: opacity .3s ease-in-out;
+      opacity: 0;
+      padding: 2px 6px;
+      position: absolute;
+      right: 4px;
+      top: 8px;
+    }
+
+    .highlight-wrap:hover .copy-btn,
+    .highlight-wrap .copy-btn:focus {
+      opacity: 1
+    }
+
+    .highlight-wrap {
+      position: relative;
+    }
+  </style>
+  <script>
+    $('.highlight').each(function(i, e) {
+      var $wrap = $('<div>').addClass('highlight-wrap');
+      $(e).after($wrap);
+      $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+        var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+          return $(e).text();
+        }).toArray().join('\n');
+        var ta = document.createElement('textarea');
+        var range = document.createRange(); //For Chrome
+        var sel = window.getSelection(); //For Chrome
+        var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+        ta.style.top = yPosition + 'px'; //Prevent page scroll
+        ta.style.position = 'absolute';
+        ta.style.opacity = '0';
+        ta.value = code;
+        ta.textContent = code; //For FireFox
+        ta.contentEditable = true;
+        ta.readOnly = false;
+        document.body.appendChild(ta);
+        range.selectNode(ta);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        ta.setSelectionRange(0, code.length);
+        var result = document.execCommand('copy');
+        
+          if (result) $(this).text('复制成功');
+          else $(this).text('复制失败');
+        
+        ta.blur(); //For iOS
+        $(this).blur();
+      })).on('mouseleave', function(e) {
+        var $b = $(this).find('.copy-btn');
+        setTimeout(function() {
+          $b.text('复制');
+        }, 300);
+      }).append(e);
+    })
+  </script>
+
+
+  
+
+</body>
+</html>

@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="Erioifpud">
 <meta property="og:description" content="如果你觉得\$emit发出事件能在父组件中使用\$on捕获，那我觉得你应该看下去。  先说结论，\$emit只会在当前实例触发事件，\$on只会捕获当前实例的事件。 on和emit的运行机制先看一段源代码：1234567891011121314Vue.prototype.$emit = function (event) &amp;#123;  var vm = this;  // 省略对事件名称格式的判">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-04-01T19:15:17.100Z">
+<meta property="og:updated_time" content="2019-06-18T09:21:42.439Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="对Vue事件机制错误理解的纠正">
 <meta name="twitter:description" content="如果你觉得\$emit发出事件能在父组件中使用\$on捕获，那我觉得你应该看下去。  先说结论，\$emit只会在当前实例触发事件，\$on只会捕获当前实例的事件。 on和emit的运行机制先看一段源代码：1234567891011121314Vue.prototype.$emit = function (event) &amp;#123;  var vm = this;  // 省略对事件名称格式的判">
@@ -390,7 +390,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-04-02 03:15:17" itemprop="dateModified" datetime="2019-04-02T03:15:17+08:00">2019-04-02</time>
+                <time title="修改时间：2019-06-18 17:21:42" itemprop="dateModified" datetime="2019-06-18T17:21:42+08:00">2019-06-18</time>
               
             
           </span>
@@ -430,7 +430,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">2k</span>
+                <span title="本文字数">2.5k</span>
               
 
               
@@ -469,23 +469,26 @@
 </blockquote>
 <p>先说结论，<strong>\$emit只会在当前实例触发事件，\$on只会捕获当前实例的事件</strong>。</p>
 <h1 id="on和emit的运行机制"><a href="#on和emit的运行机制" class="headerlink" title="on和emit的运行机制"></a>on和emit的运行机制</h1><p>先看一段源代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Vue.prototype.$emit = <span class="function"><span class="keyword">function</span> (<span class="params">event</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> vm = <span class="keyword">this</span>;</span><br><span class="line">  <span class="comment">// 省略对事件名称格式的判断</span></span><br><span class="line">  <span class="keyword">var</span> cbs = vm._events[event];</span><br><span class="line">  <span class="keyword">if</span> (cbs) &#123;</span><br><span class="line">    cbs = cbs.length &gt; <span class="number">1</span> ? toArray(cbs) : cbs;</span><br><span class="line">    <span class="keyword">var</span> args = toArray(<span class="built_in">arguments</span>, <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">var</span> info = <span class="string">"event handler for \""</span> + event + <span class="string">"\""</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, l = cbs.length; i &lt; l; i++) &#123;</span><br><span class="line">      invokeWithErrorHandling(cbs[i], vm, args, vm, info);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> vm</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
-<p>这是<code>$emit</code>函数的实现，首先是通过事件名event在<code>_events</code>属性中找到<strong>事件的回调函数</strong>，如果回调函数存在，那么就执行回调函数。</p>
-<p>在这个过程中vm为this，也就是说在组件中使用<code>this.$emit()</code>的时候，<strong>vm是指向组件本身的</strong>。</p>
+<p>这是<code>$emit</code>函数的实现，首先是通过事件名 event 在<code>_events</code>属性中找到<strong>事件的回调函数</strong>，如果回调函数存在，那么就执行回调函数。</p>
+<p>在这个过程中 vm 为 this，也就是说在组件中使用<code>this.$emit()</code>的时候，<strong>vm 是指向组件本身的</strong>。</p>
 <p>那么<code>_events</code>属性是从哪来的呢？接着看一段<code>$on</code>的源代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Vue.prototype.$on = <span class="function"><span class="keyword">function</span> (<span class="params">event, fn</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">var</span> vm = <span class="keyword">this</span>;</span><br><span class="line">  <span class="keyword">if</span> (<span class="built_in">Array</span>.isArray(event)) &#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, l = event.length; i &lt; l; i++) &#123;</span><br><span class="line">      vm.$on(event[i], fn);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    (vm._events[event] || (vm._events[event] = [])).push(fn);</span><br><span class="line">    <span class="comment">// optimize hook:event cost by using a boolean flag marked at registration</span></span><br><span class="line">    <span class="comment">// instead of a hash lookup</span></span><br><span class="line">    <span class="keyword">if</span> (hookRE.test(event)) &#123;</span><br><span class="line">      vm._hasHookEvent = <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> vm</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
-<p>关键在else块中的第一行，当调用<code>$on</code>函数时，会将事件名event作为一个<em>键</em>，放入<code>_events</code>对象中，值为回调函数组成的数组（由于可以多次使用<code>$on</code>注册事件回调，所以回调函数都会被存入数组中，按注册顺序执行）。</p>
-<h2 id="概括"><a href="#概括" class="headerlink" title="概括"></a>概括</h2><p><code>$on</code>注册的回调函数会被放入<strong>当前实例vm</strong>的<code>_events</code>对象中，<code>$emit</code>会在<strong>当前实例vm</strong>的<code>_events</code>对象中找事件的回调函数去执行。</p>
+<p>关键在 else 块中的第一行，当调用<code>$on</code>函数时，会将事件名 event 作为一个<em>键</em>，放入<code>_events</code>对象中，值为回调函数组成的数组（由于可以多次使用<code>$on</code>注册事件回调，所以回调函数都会被存入数组中，按注册顺序执行）。</p>
+<h2 id="概括"><a href="#概括" class="headerlink" title="概括"></a>概括</h2><p><code>$on</code>注册的回调函数会被放入<strong>当前实例 vm</strong>的<code>_events</code>对象中，<code>$emit</code>会在<strong>当前实例vm</strong>的<code>_events</code>对象中找事件的回调函数去执行。</p>
 <p>所以<code>$emit</code>和<code>$on</code>这两个函数涉及的对象都是vm，和父组件毫无关系。</p>
 <h1 id="关于v-on"><a href="#关于v-on" class="headerlink" title="关于v-on"></a>关于v-on</h1><p>首先，<code>v-on</code>指令是放在元素或组件中的，在指令的定义函数中的<code>el</code>是属于<strong>当前组件或元素</strong>的，这没毛病。</p>
 <p><code>v-on:click=&quot;handleClick&quot;</code>这种写法会将<code>handleClick</code>函数作为<code>binding.value</code>传给指令定义函数，这也没毛病。</p>
 <blockquote>
 <p>父级模板里的所有内容都是在父级作用域中编译的；子模板里的所有内容都是在子作用域中编译的。</p>
 </blockquote>
-<p>这是官方文档里的话，那么现在组件parent的模版是这样的：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">child</span> <span class="attr">v-on:click</span>=<span class="string">"handleClick"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
-<p>这是组件parent的模版，那很明显这里的<code>handleClick</code>函数是来自于<strong>组件parent</strong>的（使用parent的作用域），组件child上的<code>v-on:click</code>会监听child的事件（因为el来自于v-on挂载的组件），所以<code>v-on:click=&quot;handleClick&quot;</code>这个语句的意思实际上是：</p>
+<p>这是官方文档里的话，那么现在组件 parent 的模版是这样的：<br><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">template</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">child</span> <span class="attr">v-on:click</span>=<span class="string">"handleClick"</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>这是组件 parent 的模版，那很明显这里的<code>handleClick</code>函数是来自于<strong>组件parent</strong>的（使用 parent 的作用域），组件 child 上的<code>v-on:click</code>会监听child的事件（因为 el 来自于 v-on 挂载的组件），所以<code>v-on:click=&quot;handleClick&quot;</code>这个语句的意思实际上是：</p>
 <blockquote>
 <p>监听child组件上的click事件，触发事件后调用parent提供的handleClick函数（listener是在组件child上的）</p>
 </blockquote>
-<p><del>而不应该被理解成组件parent去监听child的click事件，满足条件就触发handleClick。</del></p>
+<p><del>而不应该被理解成组件 parent 去监听 child 的 click 事件，满足条件就触发 handleClick。</del></p>
+<h2 id="再进一步"><a href="#再进一步" class="headerlink" title="再进一步"></a>再进一步</h2><p>刚刚对于 v-on 的结论还是有些不准确，结合<code>$emit</code>的行为来看，v-on 实际上是将<strong>父组件提供的handle函数放入当前组件vm的<code>_events</code>中</strong>，于是<code>vm.$emit()</code>，会找到父组件传入的<code>handle</code>函数并执行。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> vm1 = <span class="keyword">new</span> Vue(&#123;</span><br><span class="line">  template: <span class="string">`</span></span><br><span class="line"><span class="string">    &lt;vm v-on:click="handleClick"&gt;&lt;/vm&gt;</span></span><br><span class="line"><span class="string">  `</span>,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    handleClick () &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(<span class="string">'click'</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> vm2 = &#123;</span><br><span class="line">  template: <span class="string">`&lt;h1&gt;123&lt;/h1&gt;`</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Vue.component(<span class="string">'vm'</span>, vm2)</span><br></pre></td></tr></table></figure>
+<p>打印<code>vm1.$children[0]._events</code>的结果为<code>{click: Array(1)}</code>。</p>
 
       
     </div>
@@ -533,6 +536,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/28/为什么Koa使用await后还能保持高效/" rel="prev" title="为什么Koa使用await后还能保持高效">
+                为什么Koa使用await后还能保持高效 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -608,7 +615,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-count">11</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -637,7 +644,21 @@
                     
                       
                     
-                    <span class="site-state-item-count">7</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">14</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -704,7 +725,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#on和emit的运行机制"><span class="nav-number">1.</span> <span class="nav-text">on和emit的运行机制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#概括"><span class="nav-number">1.1.</span> <span class="nav-text">概括</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于v-on"><span class="nav-number">2.</span> <span class="nav-text">关于v-on</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#on和emit的运行机制"><span class="nav-number">1.</span> <span class="nav-text">on和emit的运行机制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#概括"><span class="nav-number">1.1.</span> <span class="nav-text">概括</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于v-on"><span class="nav-number">2.</span> <span class="nav-text">关于v-on</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#再进一步"><span class="nav-number">2.1.</span> <span class="nav-text">再进一步</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -743,7 +764,7 @@
       <i class="fa fa-area-chart"></i>
     </span>
     
-    <span title="站点总字数">15k</span>
+    <span title="站点总字数">24k</span>
   
 
   
@@ -752,7 +773,7 @@
       <i class="fa fa-coffee"></i>
     </span>
     
-    <span title="站点阅读时长">14 分钟</span>
+    <span title="站点阅读时长">22 分钟</span>
   
 </div>
 
