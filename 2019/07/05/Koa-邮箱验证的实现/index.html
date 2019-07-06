@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.7.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="直接说结论，这功能真的不好用！老老实实买其他验证方式吧。  概述这个功能主要涉及到两个步骤，一是发邮件，二是验证，流程是： 用户注册 -&amp;gt; 发验证邮件 -&amp;gt; 访问验证 url -&amp;gt; 验证通过 简单来说就是先生成一条验证链接，发到对方的邮箱，让对方打开邮箱去确认，随后访问这条链接完成认证。 发邮件通过 SMTP 协议去发送邮件，这部分不一定要自己实现，可以使用现成的模块，比如 n">
+<meta name="keywords" content="Node.js,Koa">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Koa 邮箱验证的实现">
+<meta property="og:url" content="http://erioifpud.github.io/2019/07/05/Koa-邮箱验证的实现/index.html">
+<meta property="og:site_name" content="Erioifpud">
+<meta property="og:description" content="直接说结论，这功能真的不好用！老老实实买其他验证方式吧。  概述这个功能主要涉及到两个步骤，一是发邮件，二是验证，流程是： 用户注册 -&amp;gt; 发验证邮件 -&amp;gt; 访问验证 url -&amp;gt; 验证通过 简单来说就是先生成一条验证链接，发到对方的邮箱，让对方打开邮箱去确认，随后访问这条链接完成认证。 发邮件通过 SMTP 协议去发送邮件，这部分不一定要自己实现，可以使用现成的模块，比如 n">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-07-06T13:03:55.989Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Koa 邮箱验证的实现">
+<meta name="twitter:description" content="直接说结论，这功能真的不好用！老老实实买其他验证方式吧。  概述这个功能主要涉及到两个步骤，一是发邮件，二是验证，流程是： 用户注册 -&amp;gt; 发验证邮件 -&amp;gt; 访问验证 url -&amp;gt; 验证通过 简单来说就是先生成一条验证链接，发到对方的邮箱，让对方打开邮箱去确认，随后访问这条链接完成认证。 发邮件通过 SMTP 协议去发送邮件，这部分不一定要自己实现，可以使用现成的模块，比如 n">
+
+
+
+
+
+
+  <link rel="canonical" href="http://erioifpud.github.io/2019/07/05/Koa-邮箱验证的实现/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Koa 邮箱验证的实现 | Erioifpud</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Erioifpud</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/404/" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>404</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://erioifpud.github.io/2019/07/05/Koa-邮箱验证的实现/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Erioifpud">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/8306955?s=460&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Erioifpud">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">Koa 邮箱验证的实现
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-07-05 02:42:42" itemprop="dateCreated datePublished" datetime="2019-07-05T02:42:42+08:00">2019-07-05</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-06 21:03:55" itemprop="dateModified" datetime="2019-07-06T21:03:55+08:00">2019-07-06</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <a href="/2019/07/05/Koa-邮箱验证的实现/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2019/07/05/Koa-邮箱验证的实现/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">4.2k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">4 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>直接说结论，这功能真的不好用！老老实实买其他验证方式吧。</p>
+</blockquote>
+<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>这个功能主要涉及到两个步骤，一是发邮件，二是验证，流程是：</p>
+<p>用户注册 -&gt; 发验证邮件 -&gt; 访问验证 url -&gt; 验证通过</p>
+<p><em>简单来说就是先生成一条验证链接，发到对方的邮箱，让对方打开邮箱去确认，随后访问这条链接完成认证。</em></p>
+<h2 id="发邮件"><a href="#发邮件" class="headerlink" title="发邮件"></a>发邮件</h2><p>通过 SMTP 协议去发送邮件，这部分不一定要自己实现，可以使用现成的模块，比如 nodemailer，只需要提供邮件服务器地址、端口等基本信息就行了。</p>
+<p>url 的格式可以参考其他网站，生成 url 的关键在于要把身份信息放在 url 内，还得防止用户篡改或伪造。</p>
+<h2 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h2><p>验证的关键在于得判断 url 是否合法（避免被篡改），其次是判断时效（超时后验证失败），最后是判断 url 是否被重复使用。</p>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><h2 id="发邮件-1"><a href="#发邮件-1" class="headerlink" title="发邮件"></a>发邮件</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建一个 SMTP 客户端</span></span><br><span class="line"><span class="keyword">const</span> transport = nodemailer.createTransport(smtpTransport(&#123;</span><br><span class="line">  host: <span class="string">'smtp.exmail.qq.com'</span>,</span><br><span class="line">  secure: <span class="literal">true</span>,</span><br><span class="line">  secureConnection: <span class="literal">true</span>,</span><br><span class="line">  port: <span class="number">465</span>,</span><br><span class="line">  auth: &#123;</span><br><span class="line">    user: account,</span><br><span class="line">    pass: password</span><br><span class="line">  &#125;</span><br><span class="line">&#125;))</span><br><span class="line"></span><br><span class="line"><span class="comment">// 用 Promise 包装发送邮件的操作</span></span><br><span class="line"><span class="keyword">const</span> sendMail = <span class="function">(<span class="params">opts</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> <span class="built_in">Promise</span>(<span class="function">(<span class="params">resolve, reject</span>) =&gt;</span> &#123;</span><br><span class="line">    transport.sendMail(opts, (err, resp) =&gt; &#123;</span><br><span class="line">      <span class="keyword">if</span> (err) &#123;</span><br><span class="line">        reject(err)</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        resolve(resp)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  <span class="keyword">async</span> sendVerify (name, email) &#123;</span><br><span class="line">    <span class="comment">// 这里需要一个简单的 Map 作为缓存，作用是这样的：</span></span><br><span class="line">    <span class="comment">// 在发送验证邮件后，先以用户名 name 作为键，将发送时间储存</span></span><br><span class="line">    <span class="comment">// 一是为了防止邮件被频繁发送，可以像其他网站一样设置 60 秒重发一回</span></span><br><span class="line">    <span class="comment">// 二是在后续的验证操作中，确保链接是可用的，后续会做说明</span></span><br><span class="line">    <span class="keyword">const</span> cached = simpleCache.get(name)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 判断两次发送间隔，不足 60 秒则取消发送</span></span><br><span class="line">    <span class="keyword">if</span> (cached) &#123;</span><br><span class="line">      <span class="keyword">const</span> createdTime = cached.created</span><br><span class="line">      <span class="keyword">const</span> now = +<span class="keyword">new</span> <span class="built_in">Date</span>()</span><br><span class="line">      <span class="keyword">const</span> oneMinute = <span class="number">60000</span></span><br><span class="line">      <span class="keyword">if</span> (now - createdTime &lt; oneMinute) &#123;</span><br><span class="line">        <span class="keyword">return</span> &#123;</span><br><span class="line">          success: <span class="literal">false</span>,</span><br><span class="line">          message: <span class="string">'邮件发送间隔过短'</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 生成一段 6 位的验证码</span></span><br><span class="line">    <span class="keyword">const</span> code = <span class="built_in">Math</span>.floor(<span class="number">100000</span> + <span class="built_in">Math</span>.random() * <span class="number">900000</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 记录发送时间</span></span><br><span class="line">    <span class="keyword">const</span> timestamp = +<span class="keyword">new</span> <span class="built_in">Date</span>()</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 对用户名 name，验证码 code 和发送时间 timestamp 通过密钥 key 进行签名，防止这三者被篡改</span></span><br><span class="line">    <span class="keyword">const</span> md5 = crypto.createHash(<span class="string">'md5'</span>)</span><br><span class="line">    <span class="keyword">const</span> sign = md5.update(<span class="string">`<span class="subst">$&#123;name&#125;</span><span class="subst">$&#123;code&#125;</span><span class="subst">$&#123;timestamp&#125;</span><span class="subst">$&#123;key&#125;</span>`</span>).digest(<span class="string">'hex'</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 完成对邮件内容的构造</span></span><br><span class="line">    <span class="keyword">const</span> mailOptions = &#123;</span><br><span class="line">      <span class="keyword">from</span>: account,</span><br><span class="line">      to: email,</span><br><span class="line">      subject: <span class="string">'账号注册邮箱验证'</span>,</span><br><span class="line">      text: <span class="string">''</span>,</span><br><span class="line">      html: <span class="string">`点击链接完成注册&lt;br /&gt;http://localhost:4000/verify?user=<span class="subst">$&#123;name&#125;</span>&amp;timestamp=<span class="subst">$&#123;timestamp&#125;</span>&amp;code=<span class="subst">$&#123;code&#125;</span>&amp;sign=<span class="subst">$&#123;sign&#125;</span>`</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="keyword">await</span> sendMail(mailOptions)</span><br><span class="line">      </span><br><span class="line">      <span class="comment">// 发送邮件后将发送时间 timestamp 放入缓存中</span></span><br><span class="line">      simpleCache.set(name, &#123;</span><br><span class="line">        created: timestamp</span><br><span class="line">      &#125;)</span><br><span class="line">      <span class="keyword">return</span> &#123;</span><br><span class="line">        success: <span class="literal">true</span>,</span><br><span class="line">        message: <span class="string">'注册邮件已发送，请注意查收'</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (err) &#123;</span><br><span class="line">      <span class="built_in">console</span>.log(err)</span><br><span class="line">      <span class="keyword">return</span> &#123;</span><br><span class="line">        success: <span class="literal">false</span>,</span><br><span class="line">        message: err</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="验证-1"><a href="#验证-1" class="headerlink" title="验证"></a>验证</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">module</span>.exports = &#123;</span><br><span class="line">  verifyLink (opts) &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; user, timestamp, code, sign &#125; = opts</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 4 个参数缺一不可</span></span><br><span class="line">    <span class="keyword">if</span> (!user || !timestamp || !code || !sign) &#123;</span><br><span class="line">      <span class="keyword">return</span> &#123;</span><br><span class="line">        success: <span class="literal">false</span>,</span><br><span class="line">        message: <span class="string">'参数不合法，邮箱验证失败'</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 从缓存中捞出用户相关值，结果不存在有两种情况</span></span><br><span class="line">    <span class="comment">// 要么是重复访问（上一次验证已经通过），要么是用户自己编了一个验证链接</span></span><br><span class="line">    <span class="comment">// 这两种都算是验证失败，可以一并处理</span></span><br><span class="line">    <span class="keyword">const</span> cached = simpleCache.get(user)</span><br><span class="line">    <span class="keyword">if</span> (!cached) &#123;</span><br><span class="line">      <span class="keyword">return</span> &#123;</span><br><span class="line">        success: <span class="literal">false</span>,</span><br><span class="line">        message: <span class="string">'账户验证失败'</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 根据验证链接的参数，生成一个签名 confirmSign，和传来的签名 sign进行比对</span></span><br><span class="line">    <span class="comment">// 两者不一样表示其他参数被篡改，验证失败</span></span><br><span class="line">    <span class="keyword">const</span> md5 = crypto.createHash(<span class="string">'md5'</span>)</span><br><span class="line">    <span class="keyword">const</span> confirmSign = md5.update(<span class="string">`<span class="subst">$&#123;user&#125;</span><span class="subst">$&#123;code&#125;</span><span class="subst">$&#123;timestamp&#125;</span><span class="subst">$&#123;key&#125;</span>`</span>).digest(<span class="string">'hex'</span>)</span><br><span class="line">    <span class="keyword">if</span> (sign !== confirmSign) &#123;</span><br><span class="line">      <span class="keyword">return</span> &#123;</span><br><span class="line">        success: <span class="literal">false</span>,</span><br><span class="line">        message: <span class="string">'验证链接不合法'</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 获得当前时间 now，和缓存中的发邮件时间 timestamp 进行比对</span></span><br><span class="line">    <span class="comment">// 判断时间间隔是否超过 threshold （这里是 20 分钟），超时则验证失败</span></span><br><span class="line">    <span class="keyword">const</span> now = +<span class="keyword">new</span> <span class="built_in">Date</span>()</span><br><span class="line">    <span class="comment">// 20 minutes</span></span><br><span class="line">    <span class="keyword">const</span> threshold = <span class="number">1000</span> * <span class="number">60</span> * <span class="number">20</span></span><br><span class="line">    <span class="keyword">if</span> (now - timestamp &gt; threshold) &#123;</span><br><span class="line">      <span class="keyword">return</span> &#123;</span><br><span class="line">        success: <span class="literal">false</span>,</span><br><span class="line">        message: <span class="string">'验证链接失效，请重新获取'</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 通过了多种约束条件后表示验证成功，可以将缓存中的相关内容删除</span></span><br><span class="line">    simpleCache.delete(user)</span><br><span class="line">    <span class="keyword">return</span> &#123;</span><br><span class="line">      success: <span class="literal">true</span>,</span><br><span class="line">      message: <span class="string">'邮箱验证通过'</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>发送验证邮件的功能还是挺常见的，实现起来也不难，但就是不好用，发邮件的操作挺耗时的（看情况可以使用消息队列），还不保证对方能接到，有条件还是用其他验证方式吧，比如短信验证、滑动验证码。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Node-js/" rel="tag"># Node.js</a>
+          
+            <a href="/tags/Koa/" rel="tag"># Koa</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/18/JavaScript-的设计模式/" rel="next" title="JavaScript 的设计模式">
+                <i class="fa fa-chevron-left"></i> JavaScript 的设计模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/8306955?s=460&v=4" alt="Erioifpud">
+            
+              <p class="site-author-name" itemprop="name">Erioifpud</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">12</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL0VyaW9pZnB1ZA==" title="GitHub &rarr; https://github.com/Erioifpud"><i class="fa fa-fw fa-github"></i></span>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <span class="exturl" data-url="bWFpbHRvOmVyaW9pZnB1ZC5jbkBnbWFpbC5jb20=" title="E-Mail &rarr; mailto:erioifpud.cn@gmail.com"><i class="fa fa-fw fa-envelope"></i></span>
+                </span>
+              
+            </div>
+          
+
+          
+             <div class="cc-license motion-element" itemprop="license">
+              
+                
+              
+              
+              
+              <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></span>
+             </div>
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#发邮件"><span class="nav-number">1.1.</span> <span class="nav-text">发邮件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#验证"><span class="nav-number">1.2.</span> <span class="nav-text">验证</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实现"><span class="nav-number">2.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#发邮件-1"><span class="nav-number">2.1.</span> <span class="nav-text">发邮件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#验证-1"><span class="nav-number">2.2.</span> <span class="nav-text">验证</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Erioifpud</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+    <span title="站点总字数">28k</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+    <span title="站点阅读时长">25 分钟</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <span class="exturl theme-link" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <span class="exturl theme-link" data-url="aHR0cHM6Ly90aGVtZS1uZXh0Lm9yZw==">NexT.Gemini</span> v6.7.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=6.7.0"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=6.7.0"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+<script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+
+
+
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: true,
+    notify: false,
+    appId: 'yd5UduWAp5NDPPLcwbkMt3mr-gzGzoHsz',
+    appKey: 'cDTF4AyU1bxs1iJblUWCi8dt',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+</script>
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+      }
+      else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script>pangu.spacingPage();</script>
+
+
+  
+
+  
+  <script src="/js/src/exturl.js?v=6.7.0"></script>
+
+
+  
+
+  
+  <style>
+    .copy-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 20px;
+      color: #333;
+      white-space: nowrap;
+      vertical-align: middle;
+      cursor: pointer;
+      background-color: #eee;
+      background-image: linear-gradient(#fcfcfc, #eee);
+      border: 1px solid #d5d5d5;
+      border-radius: 3px;
+      user-select: none;
+      outline: 0;
+    }
+
+    .highlight-wrap .copy-btn {
+      transition: opacity .3s ease-in-out;
+      opacity: 0;
+      padding: 2px 6px;
+      position: absolute;
+      right: 4px;
+      top: 8px;
+    }
+
+    .highlight-wrap:hover .copy-btn,
+    .highlight-wrap .copy-btn:focus {
+      opacity: 1
+    }
+
+    .highlight-wrap {
+      position: relative;
+    }
+  </style>
+  <script>
+    $('.highlight').each(function(i, e) {
+      var $wrap = $('<div>').addClass('highlight-wrap');
+      $(e).after($wrap);
+      $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+        var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+          return $(e).text();
+        }).toArray().join('\n');
+        var ta = document.createElement('textarea');
+        var range = document.createRange(); //For Chrome
+        var sel = window.getSelection(); //For Chrome
+        var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+        ta.style.top = yPosition + 'px'; //Prevent page scroll
+        ta.style.position = 'absolute';
+        ta.style.opacity = '0';
+        ta.value = code;
+        ta.textContent = code; //For FireFox
+        ta.contentEditable = true;
+        ta.readOnly = false;
+        document.body.appendChild(ta);
+        range.selectNode(ta);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        ta.setSelectionRange(0, code.length);
+        var result = document.execCommand('copy');
+        
+          if (result) $(this).text('复制成功');
+          else $(this).text('复制失败');
+        
+        ta.blur(); //For iOS
+        $(this).blur();
+      })).on('mouseleave', function(e) {
+        var $b = $(this).find('.copy-btn');
+        setTimeout(function() {
+          $b.text('复制');
+        }, 300);
+      }).append(e);
+    })
+  </script>
+
+
+  
+
+</body>
+</html>
