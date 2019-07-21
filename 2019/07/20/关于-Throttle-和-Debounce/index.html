@@ -103,25 +103,27 @@
 
 
 
-  <meta name="description" content="概述首先，这里提到的骨架屏组件并不是指一个显示为骨架屏的组件，指的是一个容器 fallback，骨架屏和真实的组件作为两个 slot 置于 fallback 中。fallback 监听 fallback:show 事件，用于控制显示某个 slot。 实现初版这个需求实现起来是很简单的，通常会写成这样： 123456789101112131415161718192021&amp;lt;template&amp;gt">
-<meta name="keywords" content="Vue,组件,问题总结">
+  <meta name="description" content="概述这两个函数常用于优化方面，功能分别为”将短时间内连续的操作集合成一个，也就是每段时间最多执行一次“与”将短时间内连续的操作只视作一次“。 这个说法有点抽象，可以看个图：  操作会新建时间轴，在同一个时间轴内的操作都会被”吸收”，直到时间轴结束才触发，这是节流。 每个操作都会新建时间轴，并且替换原有的，直到时间轴结束才触发，这是去抖，也可以理解成有一个公共的时间轴，每次操作都会重置他。 这里的关">
+<meta name="keywords" content="浅析,JavaScript">
 <meta property="og:type" content="article">
-<meta property="og:title" content="做骨架屏组件时遇到的问题">
-<meta property="og:url" content="http://erioifpud.github.io/2019/07/07/做骨架屏组件时遇到的问题/index.html">
+<meta property="og:title" content="关于 Throttle 和 Debounce">
+<meta property="og:url" content="http://erioifpud.github.io/2019/07/20/关于-Throttle-和-Debounce/index.html">
 <meta property="og:site_name" content="Erioifpud">
-<meta property="og:description" content="概述首先，这里提到的骨架屏组件并不是指一个显示为骨架屏的组件，指的是一个容器 fallback，骨架屏和真实的组件作为两个 slot 置于 fallback 中。fallback 监听 fallback:show 事件，用于控制显示某个 slot。 实现初版这个需求实现起来是很简单的，通常会写成这样： 123456789101112131415161718192021&amp;lt;template&amp;gt">
+<meta property="og:description" content="概述这两个函数常用于优化方面，功能分别为”将短时间内连续的操作集合成一个，也就是每段时间最多执行一次“与”将短时间内连续的操作只视作一次“。 这个说法有点抽象，可以看个图：  操作会新建时间轴，在同一个时间轴内的操作都会被”吸收”，直到时间轴结束才触发，这是节流。 每个操作都会新建时间轴，并且替换原有的，直到时间轴结束才触发，这是去抖，也可以理解成有一个公共的时间轴，每次操作都会重置他。 这里的关">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-07-08T11:43:08.738Z">
+<meta property="og:image" content="https://i.loli.net/2019/07/21/5d3441148062816406.png">
+<meta property="og:updated_time" content="2019-07-21T11:19:03.480Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="做骨架屏组件时遇到的问题">
-<meta name="twitter:description" content="概述首先，这里提到的骨架屏组件并不是指一个显示为骨架屏的组件，指的是一个容器 fallback，骨架屏和真实的组件作为两个 slot 置于 fallback 中。fallback 监听 fallback:show 事件，用于控制显示某个 slot。 实现初版这个需求实现起来是很简单的，通常会写成这样： 123456789101112131415161718192021&amp;lt;template&amp;gt">
+<meta name="twitter:title" content="关于 Throttle 和 Debounce">
+<meta name="twitter:description" content="概述这两个函数常用于优化方面，功能分别为”将短时间内连续的操作集合成一个，也就是每段时间最多执行一次“与”将短时间内连续的操作只视作一次“。 这个说法有点抽象，可以看个图：  操作会新建时间轴，在同一个时间轴内的操作都会被”吸收”，直到时间轴结束才触发，这是节流。 每个操作都会新建时间轴，并且替换原有的，直到时间轴结束才触发，这是去抖，也可以理解成有一个公共的时间轴，每次操作都会重置他。 这里的关">
+<meta name="twitter:image" content="https://i.loli.net/2019/07/21/5d3441148062816406.png">
 
 
 
 
 
 
-  <link rel="canonical" href="http://erioifpud.github.io/2019/07/07/做骨架屏组件时遇到的问题/">
+  <link rel="canonical" href="http://erioifpud.github.io/2019/07/20/关于-Throttle-和-Debounce/">
 
 
 
@@ -131,7 +133,7 @@
   };
 </script>
 
-  <title>做骨架屏组件时遇到的问题 | Erioifpud</title>
+  <title>关于 Throttle 和 Debounce | Erioifpud</title>
   
 
 
@@ -330,7 +332,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://erioifpud.github.io/2019/07/07/做骨架屏组件时遇到的问题/">
+    <link itemprop="mainEntityOfPage" href="http://erioifpud.github.io/2019/07/20/关于-Throttle-和-Debounce/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Erioifpud">
@@ -347,7 +349,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">做骨架屏组件时遇到的问题
+          <h2 class="post-title" itemprop="name headline">关于 Throttle 和 Debounce
 
               
             
@@ -373,7 +375,7 @@
                 
               
 
-              <time title="创建时间：2019-07-07 02:09:54" itemprop="dateCreated datePublished" datetime="2019-07-07T02:09:54+08:00">2019-07-07</time>
+              <time title="创建时间：2019-07-20 20:46:47" itemprop="dateCreated datePublished" datetime="2019-07-20T20:46:47+08:00">2019-07-20</time>
             
 
             
@@ -390,7 +392,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-07-08 19:43:08" itemprop="dateModified" datetime="2019-07-08T19:43:08+08:00">2019-07-08</time>
+                <time title="修改时间：2019-07-21 19:19:03" itemprop="dateModified" datetime="2019-07-21T19:19:03+08:00">2019-07-21</time>
               
             
           </span>
@@ -407,8 +409,8 @@
                   <i class="fa fa-comment-o"></i>
                 </span>
             
-                <a href="/2019/07/07/做骨架屏组件时遇到的问题/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2019/07/07/做骨架屏组件时遇到的问题/" itemprop="commentCount"></span>
+                <a href="/2019/07/20/关于-Throttle-和-Debounce/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2019/07/20/关于-Throttle-和-Debounce/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -430,7 +432,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">2k</span>
+                <span title="本文字数">1.8k</span>
               
 
               
@@ -464,20 +466,23 @@
       
 
       
-        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>首先，这里提到的骨架屏组件并不是指一个显示为骨架屏的组件，指的是一个容器 fallback，骨架屏和真实的组件作为两个 slot 置于 fallback 中。fallback 监听 <code>fallback:show</code> 事件，用于控制显示某个 slot。</p>
-<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><h2 id="初版"><a href="#初版" class="headerlink" title="初版"></a>初版</h2><p>这个需求实现起来是很简单的，通常会写成这样：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div class=&quot;fallback&quot;&gt;</span><br><span class="line">    &lt;slot v-if=&quot;show&quot;&gt;&lt;/slot&gt;</span><br><span class="line">    &lt;slot name=&quot;placeholder&quot; v-else&gt;&lt;/slot&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default &#123;</span><br><span class="line">  data () &#123;</span><br><span class="line">    return &#123;</span><br><span class="line">      show: false</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  created () &#123;</span><br><span class="line">    this.$on(&apos;fallback:show&apos;, () =&gt; &#123;</span><br><span class="line">      this.show = true</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
-<h3 id="已知问题"><a href="#已知问题" class="headerlink" title="已知问题"></a>已知问题</h3><p>但这种写法并不完美，因为外层元素已经写明了是 <code>div</code>，考虑一种情况，比如我要给 <code>nav</code> 中选项设置 fallback，那么这样就直接在 <code>nav</code> 中多加了一层 <code>div</code>，从 <strong>HTML 语义</strong>的角度来看是不对的，语义被改变了：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">nav</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"fallback"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">skeleton</span>&gt;</span><span class="tag">&lt;/<span class="name">skeleton</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">item</span>&gt;</span><span class="tag">&lt;/<span class="name">item</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">item</span>&gt;</span><span class="tag">&lt;/<span class="name">item</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">nav</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p>还有一种情况，比方说有个 Flex 容器，我要给他的 item 设置 fallback，那么 fallback 加的一层 <code>div</code> 直接就破坏了 Flex 布局的结构：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">flex</span>=<span class="string">"main:center"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">fallback</span>&gt;</span></span><br><span class="line">  	<span class="tag">&lt;<span class="name">div</span> <span class="attr">flex-box</span>=<span class="string">"1"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">flex-box</span>=<span class="string">"1"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">flex-box</span>=<span class="string">"1"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">fallback</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p>当然了，解决方法还是有的，那就是移除最外层的 Flex 容器，将 fallback 变成一个 Flex 容器，但这又回到了问题 1 上。</p>
-<h2 id="改版"><a href="#改版" class="headerlink" title="改版"></a>改版</h2><p>为了将初版整合进项目，我改了很多容器元素的样式，我觉得这不是一个很好的解决方案，所以我又对他进行了改进。</p>
-<p>理想的状态是，不要外层 <code>div</code> 元素，因为元素类型在开发环境中是不确定的，起到关键作用的只是两个 slot，所以只需要在两个 slot 之间切换就行了，但是这种写法在 template 中肯定无法实现，因为<strong>根元素只能有一个（即时用了 v-if 和 v-else 二选一）</strong>，同时 <strong>template 也不能成为根元素</strong>。</p>
-<p>这个时候就需要使用 render 函数了，通过 createElement 动态构建一个模版：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">render (h) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.show</span><br><span class="line">  ? h(<span class="string">'template'</span>, &#123;&#125;, [<span class="keyword">this</span>.$slots.default])</span><br><span class="line">  : h(<span class="string">'template'</span>, &#123;&#125;, [<span class="keyword">this</span>.$slots.placeholder])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>与单文件组件中的 template 不一样，这里是可以作为根元素使用的，并且实现了 v-if 与 v-else 的效果，还不会被编译器理解成要设置多个根元素。</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">fallback</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">skeleton</span> <span class="attr">slot</span>=<span class="string">"placeholder"</span>&gt;</span><span class="tag">&lt;/<span class="name">skeleton</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">item</span>&gt;</span><span class="tag">&lt;/<span class="name">item</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">fallback</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">&lt;!-- 实际效果为 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">skeleton</span>&gt;</span><span class="tag">&lt;/<span class="name">skeleton</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!-- 或者 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">item</span>&gt;</span><span class="tag">&lt;/<span class="name">item</span>&gt;</span></span><br></pre></td></tr></table></figure>
+        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>这两个函数常用于优化方面，功能分别为”<strong>将短时间内连续的操作集合成一个，也就是每段时间最多执行一次</strong>“与”<strong>将短时间内连续的操作只视作一次</strong>“。</p>
+<p>这个说法有点抽象，可以看个图：</p>
+<p><img src="https://i.loli.net/2019/07/21/5d3441148062816406.png" alt="WX20190721-184002@2x.png"></p>
+<p>操作会新建时间轴，在<strong>同一个时间轴内</strong>的操作都会被”吸收”，直到时间轴结束才触发，这是<strong>节流</strong>。</p>
+<p>每个操作都会新建时间轴，并且<strong>替换原有的</strong>，直到时间轴结束才触发，这是去抖，也可以理解成有一个<strong>公共的时间轴</strong>，每次操作都会重置他。</p>
+<p>这里的<strong>关键就是时间轴会不会被刷新</strong>，这两个函数都是高阶函数，接受函数作为参数，同时返回新的函数，<u>要记录下前一个操作，就得使用闭包的特性</u>。</p>
+<h1 id="节流"><a href="#节流" class="headerlink" title="节流"></a>节流</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> throttle = <span class="function">(<span class="params">func, threshold = <span class="number">500</span></span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> last = <span class="number">0</span></span><br><span class="line">  <span class="keyword">return</span> <span class="function">(<span class="params">...args</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">const</span> now = <span class="keyword">new</span> <span class="built_in">Date</span>()</span><br><span class="line">    <span class="keyword">if</span> (now - last &gt; threshold) &#123;</span><br><span class="line">			setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;   </span><br><span class="line">        func.apply(<span class="keyword">this</span>, args)</span><br><span class="line">      &#125;, threshold)</span><br><span class="line">      last = now</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首先记录上一个时间轴的初始时间 last，当与上一次执行的时间超过 500 毫秒时，表示上一个时间轴已经结束，这也就意味着本次操作会创建一个新的时间轴，所以使用 <code>setTimeout</code> 在 500 毫秒后触发一次，之后记录下当前时间轴的初始时间 last。</p>
+<p>还可以换一种写法，用定时器的 ID timer 来取代时间：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> throttle = <span class="function">(<span class="params">func, threshold = <span class="number">500</span></span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> timer</span><br><span class="line">  <span class="keyword">return</span> <span class="function">(<span class="params">...args</span>) =&gt;</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (timer) &#123;</span><br><span class="line">			<span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">		timer = setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">			func.apply(<span class="keyword">this</span>, args)</span><br><span class="line">			timer = <span class="literal">null</span></span><br><span class="line">    &#125;, threshold)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>第一次操作先使用 <code>setTimeout</code> 设置时间轴结束后的触发，并保存 ID 至 timer，下一次操作会判断 timer是否存在，存在表示<strong>上一个时间轴未结束</strong>，不做处理，若不存在则表示<strong>上一个时间轴已经结束</strong>，可以看作一个新操作进行处理。</p>
+<h1 id="去抖"><a href="#去抖" class="headerlink" title="去抖"></a>去抖</h1><p>与节流相比，去抖要频繁创建 <code>setTimeout</code> 又要频繁清除之前的 <code>setTimeout</code>，所以必须保留 timer，再加上 last 这个时间变量会更加复杂，所以这里只展示 timer 的写法：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> debounce = <span class="function">(<span class="params">func, threshold = <span class="number">500</span></span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">let</span> timer</span><br><span class="line">  <span class="keyword">return</span> <span class="function">(<span class="params">...args</span>) =&gt;</span> &#123;</span><br><span class="line">    clearTimeout(timer)</span><br><span class="line">    timer = setTimeout(<span class="function"><span class="params">()</span> =&gt;</span> &#123;</span><br><span class="line">      timer = <span class="literal">null</span></span><br><span class="line">      func.apply(<span class="keyword">this</span>, args)</span><br><span class="line">    &#125;, threshold)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首先使用 timer 记录上一次的定时器 ID，有新操作时先清除定时器，再创建一个新的定时器，直到时间间隔大于 threshold，让定时器执行完成。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>还有更优秀的实现，比如 lodash 的，可以让 debounce 在首次操作后就立即触发，并且忽视后续操作。</p>
+<p>这里只是用做解析的例子，所以只提供了简单的实现，这两个函数通常会用在<strong>降低操作的频繁程度</strong>上，比如百度搜索的搜索栏，使用了去抖，并不是每打一个字都会发一次搜索请求的，打字过快时就不会发请求了，直到速度暂缓或者停止时才会继续发请求。</p>
+<p>节流也是用在类似的环境下，比如修改 viewport 尺寸会引发<strong>重排</strong>，重排多了会影响效率，这个时候可以考虑使用节流或去抖，但是去抖会在频繁操作结束后执行，而节流在频繁操作中每隔一段时间就会执行一次，这可以使操作效果更加平滑缓和。</p>
 
       
     </div>
@@ -501,11 +506,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Vue/" rel="tag"># Vue</a>
+            <a href="/tags/浅析/" rel="tag"># 浅析</a>
           
-            <a href="/tags/组件/" rel="tag"># 组件</a>
-          
-            <a href="/tags/问题总结/" rel="tag"># 问题总结</a>
+            <a href="/tags/JavaScript/" rel="tag"># JavaScript</a>
           
         </div>
       
@@ -518,8 +521,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/07/05/Koa-邮箱验证的实现/" rel="next" title="Koa 邮箱验证的实现">
-                <i class="fa fa-chevron-left"></i> Koa 邮箱验证的实现
+              <a href="/2019/07/13/关于-v-on-的-native-修饰符/" rel="next" title="关于 v-on 的 native 修饰符">
+                <i class="fa fa-chevron-left"></i> 关于 v-on 的 native 修饰符
               </a>
             
           </div>
@@ -527,10 +530,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/07/13/关于-v-on-的-native-修饰符/" rel="prev" title="关于 v-on 的 native 修饰符">
-                关于 v-on 的 native 修饰符 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -722,7 +721,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实现"><span class="nav-number">2.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#初版"><span class="nav-number">2.1.</span> <span class="nav-text">初版</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#已知问题"><span class="nav-number">2.1.1.</span> <span class="nav-text">已知问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#改版"><span class="nav-number">2.2.</span> <span class="nav-text">改版</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#节流"><span class="nav-number">2.</span> <span class="nav-text">节流</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#去抖"><span class="nav-number">3.</span> <span class="nav-text">去抖</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
 
           </div>
