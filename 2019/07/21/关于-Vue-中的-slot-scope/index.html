@@ -103,25 +103,25 @@
 
 
 
-  <meta name="description" content="前些天在写后端的角色鉴权，访问权限在 Controller 处定义，原本的想法是使用装饰器实现，后来通过了 Builder 的方式完成。大致的代码如下： 123456789101112131415161718class Builder &amp;#123;  constructor (router) &amp;#123;    this.router = router    this.options = &amp;#12">
-<meta name="keywords" content="函数,Wrapper">
+  <meta name="description" content="其实这个特性我见的不多，所以一直没去了解他的功能，现在觉得这个特性挺灵活的，能写出高复用性的组件。  概述slot scope 是对 slot 功能的增强，主要功能是将子组件中的数据带出给父组件使用，以函数作为例子，可以看作是： 123function (list) &amp;#123;  return list.map().reduce() // ......&amp;#125; 让子组件可以对 props">
+<meta name="keywords" content="Vue,浅析">
 <meta property="og:type" content="article">
-<meta property="og:title" content="关于函数的Wrapper">
-<meta property="og:url" content="http://erioifpud.github.io/2019/05/01/关于函数的Wrapper/index.html">
+<meta property="og:title" content="关于 Vue 中的 slot-scope">
+<meta property="og:url" content="http://erioifpud.github.io/2019/07/21/关于-Vue-中的-slot-scope/index.html">
 <meta property="og:site_name" content="Erioifpud">
-<meta property="og:description" content="前些天在写后端的角色鉴权，访问权限在 Controller 处定义，原本的想法是使用装饰器实现，后来通过了 Builder 的方式完成。大致的代码如下： 123456789101112131415161718class Builder &amp;#123;  constructor (router) &amp;#123;    this.router = router    this.options = &amp;#12">
+<meta property="og:description" content="其实这个特性我见的不多，所以一直没去了解他的功能，现在觉得这个特性挺灵活的，能写出高复用性的组件。  概述slot scope 是对 slot 功能的增强，主要功能是将子组件中的数据带出给父组件使用，以函数作为例子，可以看作是： 123function (list) &amp;#123;  return list.map().reduce() // ......&amp;#125; 让子组件可以对 props">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-06-18T09:22:39.844Z">
+<meta property="og:updated_time" content="2019-07-21T19:36:42.699Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="关于函数的Wrapper">
-<meta name="twitter:description" content="前些天在写后端的角色鉴权，访问权限在 Controller 处定义，原本的想法是使用装饰器实现，后来通过了 Builder 的方式完成。大致的代码如下： 123456789101112131415161718class Builder &amp;#123;  constructor (router) &amp;#123;    this.router = router    this.options = &amp;#12">
+<meta name="twitter:title" content="关于 Vue 中的 slot-scope">
+<meta name="twitter:description" content="其实这个特性我见的不多，所以一直没去了解他的功能，现在觉得这个特性挺灵活的，能写出高复用性的组件。  概述slot scope 是对 slot 功能的增强，主要功能是将子组件中的数据带出给父组件使用，以函数作为例子，可以看作是： 123function (list) &amp;#123;  return list.map().reduce() // ......&amp;#125; 让子组件可以对 props">
 
 
 
 
 
 
-  <link rel="canonical" href="http://erioifpud.github.io/2019/05/01/关于函数的Wrapper/">
+  <link rel="canonical" href="http://erioifpud.github.io/2019/07/21/关于-Vue-中的-slot-scope/">
 
 
 
@@ -131,7 +131,7 @@
   };
 </script>
 
-  <title>关于函数的Wrapper | Erioifpud</title>
+  <title>关于 Vue 中的 slot-scope | Erioifpud</title>
   
 
 
@@ -330,7 +330,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://erioifpud.github.io/2019/05/01/关于函数的Wrapper/">
+    <link itemprop="mainEntityOfPage" href="http://erioifpud.github.io/2019/07/21/关于-Vue-中的-slot-scope/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Erioifpud">
@@ -347,7 +347,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">关于函数的Wrapper
+          <h2 class="post-title" itemprop="name headline">关于 Vue 中的 slot-scope
 
               
             
@@ -373,7 +373,7 @@
                 
               
 
-              <time title="创建时间：2019-05-01 23:34:15" itemprop="dateCreated datePublished" datetime="2019-05-01T23:34:15+08:00">2019-05-01</time>
+              <time title="创建时间：2019-07-21 20:14:04" itemprop="dateCreated datePublished" datetime="2019-07-21T20:14:04+08:00">2019-07-21</time>
             
 
             
@@ -390,7 +390,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-06-18 17:22:39" itemprop="dateModified" datetime="2019-06-18T17:22:39+08:00">2019-06-18</time>
+                <time title="修改时间：2019-07-22 03:36:42" itemprop="dateModified" datetime="2019-07-22T03:36:42+08:00">2019-07-22</time>
               
             
           </span>
@@ -407,8 +407,8 @@
                   <i class="fa fa-comment-o"></i>
                 </span>
             
-                <a href="/2019/05/01/关于函数的Wrapper/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2019/05/01/关于函数的Wrapper/" itemprop="commentCount"></span>
+                <a href="/2019/07/21/关于-Vue-中的-slot-scope/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2019/07/21/关于-Vue-中的-slot-scope/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -430,7 +430,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">1.3k</span>
+                <span title="本文字数">2.3k</span>
               
 
               
@@ -444,7 +444,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">1 分钟</span>
+                <span title="阅读时长">2 分钟</span>
               
             </div>
           
@@ -464,15 +464,27 @@
       
 
       
-        <p>前些天在写后端的角色鉴权，访问权限在 Controller 处定义，原本的想法是使用装饰器实现，后来通过了 Builder 的方式完成。<br>大致的代码如下：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Builder</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span> (router) &#123;</span><br><span class="line">    <span class="keyword">this</span>.router = router</span><br><span class="line">    <span class="keyword">this</span>.options = &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  handler (fn) &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> fn !== <span class="string">'function'</span>) &#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">Error</span>(<span class="string">'Handler must be a function'</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">this</span>.options.handler = fn</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span></span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  role (action, indexRole) &#123;</span><br><span class="line">  </span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>通过 Builder 构造出 Controller，handler 指定了需要执行的函数，role 的功能是对已有 handler 进行包装（目前是顺序敏感的，必须放在 handler 之后，包装成对 handler 的处理函数估计可以解决），加入角色校验的相关代码，这里就涉及到了函数的Wrapper。</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">this</span>.options.handler = <span class="function"><span class="keyword">function</span> (<span class="params">ctx, next</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 角色校验的实现</span></span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.options.handler()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这段代码乍一看没什么问题，实际上形成了一个闭包，function还没有执行，<code>this.options.handler</code>还未确定，所以成了递归函数。</p>
-<p>那么解决方式有两种：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 方法1</span></span><br><span class="line"><span class="keyword">let</span> origin = <span class="keyword">this</span>.options.handler</span><br><span class="line"></span><br><span class="line"><span class="keyword">this</span>.options.handler = <span class="function"><span class="keyword">function</span> (<span class="params">ctx, next</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 角色校验的实现</span></span><br><span class="line">  origin(ctx, next)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>先保存原有的handler，之后定义一个wrapper对原有handler进行包装。</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 方法2</span></span><br><span class="line"><span class="keyword">this</span>.options.handler = <span class="keyword">new</span> <span class="built_in">Proxy</span>(<span class="keyword">this</span>.options.handler, &#123;</span><br><span class="line">  apply (target, thisArg, argumentsList) &#123;</span><br><span class="line">    <span class="keyword">const</span> [ctx, next] = argumentsList</span><br><span class="line">    <span class="comment">// 角色校验的实现</span></span><br><span class="line">    <span class="keyword">return</span> target.apply(thisArg, argumentsList)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-<p><code>Proxy</code>是ES6加入的新特性，能通过handler对象（和前文的handler不一样）的规则对已有target进行改造，整体上是一个<strong>代理模式</strong>，这里使用的<code>apply</code>实际上是对target函数的包装。</p>
+        <blockquote>
+<p>其实这个特性我见的不多，所以一直没去了解他的功能，现在觉得这个特性挺灵活的，能写出高复用性的组件。</p>
+</blockquote>
+<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>slot scope 是对 slot 功能的增强，主要功能是<u>将子组件中的数据带出给父组件使用</u>，以函数作为例子，可以看作是：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> (<span class="params">list</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> list.map().reduce() <span class="comment">// ......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>让子组件可以对 props 做一系列的操作，之后将结果通过 slot scope 传递给父组件，让父组件决定显示的方式。</p>
+<p>这种需求之所以要用到 slot scope，原因在于在父组件的作用域中，是无法访问子组件作用域的，就算子组件和父组件同时拥有 user 这个属性，在父组件中 <code>this.user</code> 指向的还是自己本身的 user，所以需要 slot scope 把数据带出来。</p>
+<h1 id="举个例子🌰"><a href="#举个例子🌰" class="headerlink" title="举个例子🌰"></a>举个例子🌰</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;li v-for=&quot;(item, k) in list&quot; :key=&quot;k&quot;&gt;</span><br><span class="line">      &lt;slot :index=&quot;k&quot; :payload=&quot;item&quot;&gt;&lt;/slot&gt;</span><br><span class="line">    &lt;/li&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default &#123;</span><br><span class="line">  props: &#123;</span><br><span class="line">    list: Array</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+<p>这个组件叫做 MakeOrderedList，用于作为有序列表的容器，在父组件中是这样的：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">make-ordered-list</span> <span class="attr">:list</span>=<span class="string">"[&#123;name: 'a', age: 12&#125;, &#123;name: 'abc', age: 10&#125;]"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">template</span> <span class="attr">slot-scope</span>=<span class="string">"scope"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">span</span>&gt;</span>&#123;&#123; scope.index &#125;&#125;<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">:value</span>=<span class="string">"scope.payload.name"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"number"</span> <span class="attr">:value</span>=<span class="string">"scope.payload.age"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">make-ordered-list</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>list 是任意格式的列表，子组件会将 list 拆分为 key 和 value，并将这两个属性通过 v-bind 的形式回传，在父组件中通过 <code>slot-scope=&quot;scope&quot;</code> 新建一个名为 scope 的对象<strong>承接子组件回传的属性</strong>，template 中的就是显示的具体结构了。</p>
+<h1 id="换个例子🌰"><a href="#换个例子🌰" class="headerlink" title="换个例子🌰"></a>换个例子🌰</h1><p>刚刚的例子仅仅是为了展示功能，没有意义，这里举 UI 框架中常见的 table 组件作为例子，在 Vuetify 中，table 组件的用法为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;v-data-table</span><br><span class="line">  :headers=&quot;headers&quot;</span><br><span class="line">  :items=&quot;list&quot;</span><br><span class="line">&gt;</span><br><span class="line">  &lt;template v-slot:items=&quot;props&quot;&gt;</span><br><span class="line">    &lt;td&gt;&#123;&#123; props.item.planet &#125;&#125;&lt;/td&gt;</span><br><span class="line">    &lt;td class=&quot;text-xs-left&quot;&gt;&#123;&#123; props.item.mission &#125;&#125;&lt;/td&gt;</span><br><span class="line">    &lt;td class=&quot;text-xs-left&quot;&gt;&#123;&#123; props.item.type &#125;&#125;&lt;/td&gt;</span><br><span class="line">    &lt;td class=&quot;text-xs-left&quot;&gt;&#123;&#123; props.item.enemy &#125;&#125;&lt;/td&gt;</span><br><span class="line">  &lt;/template&gt;</span><br><span class="line">&lt;/v-data-table&gt;</span><br></pre></td></tr></table></figure>
+<p>data table 这个组件接受了两个 props，他根据 headers 渲染出<u>表头</u>，接受 items 作为表内容，但是不立即渲染出来，而是将元素回传给父组件，<strong>目的是让父组件去决定显示的效果</strong>。</p>
+<h1 id="关于语法"><a href="#关于语法" class="headerlink" title="关于语法"></a>关于语法</h1><p>以上两个例子用了不同的 slot 语法，第二个例子中的语法是新的，大概是 2.6.0 更新的。</p>
+<p>改动：</p>
+<p>插槽的语法从 <code>slot</code> 与 <code>slot=&quot;name&quot;</code> 变成了 <code>v-slot</code> 与 <code>v-slot:name</code>。</p>
+<p>插槽作用域从 <code>slot-scope</code> 改成了 <code>v-slot:slotName</code>，旧版本只能和 <code>slot</code> 组合使用以指定插槽。</p>
+<p>特性：</p>
+<p>新增了动态插槽，通过 <code>v-slot:[dynamicSlotName]</code> 来声明，参考 ES6 的语法。</p>
+<p>新增了<strong>具名插槽</strong>的缩写 <code>#</code>，比如 <code>#name</code>、<code>#header</code>，要注意的是<strong>具名</strong>，默认插槽不能简写，可参考 v-bind 或 v-on（除非写成 <code>#default</code>）。</p>
 
       
     </div>
@@ -496,9 +508,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/函数/" rel="tag"># 函数</a>
+            <a href="/tags/Vue/" rel="tag"># Vue</a>
           
-            <a href="/tags/Wrapper/" rel="tag"># Wrapper</a>
+            <a href="/tags/浅析/" rel="tag"># 浅析</a>
           
         </div>
       
@@ -511,8 +523,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/04/28/为什么Koa使用await后还能保持高效/" rel="next" title="为什么Koa使用await后还能保持高效">
-                <i class="fa fa-chevron-left"></i> 为什么Koa使用await后还能保持高效
+              <a href="/2019/07/20/关于-Throttle-和-Debounce/" rel="next" title="关于 Throttle 和 Debounce">
+                <i class="fa fa-chevron-left"></i> 关于 Throttle 和 Debounce
               </a>
             
           </div>
@@ -520,10 +532,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/06/14/判断元素是否在可视区域内/" rel="prev" title="判断元素是否在可视区域内">
-                判断元素是否在可视区域内 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -572,8 +580,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <div class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
             
@@ -695,6 +712,23 @@
         </div>
       </div>
 
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#举个例子🌰"><span class="nav-number">2.</span> <span class="nav-text">举个例子🌰</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#换个例子🌰"><span class="nav-number">3.</span> <span class="nav-text">换个例子🌰</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于语法"><span class="nav-number">4.</span> <span class="nav-text">关于语法</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
       
 
       
