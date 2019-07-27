@@ -103,25 +103,25 @@
 
 
 
-  <meta name="description" content="其实这个特性我见的不多，所以一直没去了解他的功能，现在觉得这个特性挺灵活的，能写出高复用性的组件。  概述slot scope 是对 slot 功能的增强，主要功能是将子组件中的数据带出给父组件使用，以函数作为例子，可以看作是： 123function (list) &amp;#123;  return list.map().reduce() // ......&amp;#125; 让子组件可以对 props">
-<meta name="keywords" content="Vue,浅析">
+  <meta name="description" content="记一次做 OAuth2 应用时懵逼的经历  正文这两天在弄授权登录，使用的是 Github 的服务，授权登录的流程很多文章都介绍过，就写个大概吧。  先是打开授权登录页面。 完成 Github 登录后页面会跳转到 Github 的认证接口。 完成认证后会跳转到开发者预留的后端 callback 接口，跳转时会带有 code 参数。 后端根据 Github 传来的 code（也可能是用户篡改后的）">
+<meta name="keywords" content="OAuth2">
 <meta property="og:type" content="article">
-<meta property="og:title" content="关于 Vue 中的 slot-scope">
-<meta property="og:url" content="http://erioifpud.github.io/2019/07/21/关于-Vue-中的-slot-scope/index.html">
+<meta property="og:title" content="关于前端的 OAuth2">
+<meta property="og:url" content="http://erioifpud.github.io/2019/07/26/关于前端的-OAuth2/index.html">
 <meta property="og:site_name" content="Erioifpud">
-<meta property="og:description" content="其实这个特性我见的不多，所以一直没去了解他的功能，现在觉得这个特性挺灵活的，能写出高复用性的组件。  概述slot scope 是对 slot 功能的增强，主要功能是将子组件中的数据带出给父组件使用，以函数作为例子，可以看作是： 123function (list) &amp;#123;  return list.map().reduce() // ......&amp;#125; 让子组件可以对 props">
+<meta property="og:description" content="记一次做 OAuth2 应用时懵逼的经历  正文这两天在弄授权登录，使用的是 Github 的服务，授权登录的流程很多文章都介绍过，就写个大概吧。  先是打开授权登录页面。 完成 Github 登录后页面会跳转到 Github 的认证接口。 完成认证后会跳转到开发者预留的后端 callback 接口，跳转时会带有 code 参数。 后端根据 Github 传来的 code（也可能是用户篡改后的）">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-07-21T19:36:42.699Z">
+<meta property="og:updated_time" content="2019-07-26T19:35:45.124Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="关于 Vue 中的 slot-scope">
-<meta name="twitter:description" content="其实这个特性我见的不多，所以一直没去了解他的功能，现在觉得这个特性挺灵活的，能写出高复用性的组件。  概述slot scope 是对 slot 功能的增强，主要功能是将子组件中的数据带出给父组件使用，以函数作为例子，可以看作是： 123function (list) &amp;#123;  return list.map().reduce() // ......&amp;#125; 让子组件可以对 props">
+<meta name="twitter:title" content="关于前端的 OAuth2">
+<meta name="twitter:description" content="记一次做 OAuth2 应用时懵逼的经历  正文这两天在弄授权登录，使用的是 Github 的服务，授权登录的流程很多文章都介绍过，就写个大概吧。  先是打开授权登录页面。 完成 Github 登录后页面会跳转到 Github 的认证接口。 完成认证后会跳转到开发者预留的后端 callback 接口，跳转时会带有 code 参数。 后端根据 Github 传来的 code（也可能是用户篡改后的）">
 
 
 
 
 
 
-  <link rel="canonical" href="http://erioifpud.github.io/2019/07/21/关于-Vue-中的-slot-scope/">
+  <link rel="canonical" href="http://erioifpud.github.io/2019/07/26/关于前端的-OAuth2/">
 
 
 
@@ -131,7 +131,7 @@
   };
 </script>
 
-  <title>关于 Vue 中的 slot-scope | Erioifpud</title>
+  <title>关于前端的 OAuth2 | Erioifpud</title>
   
 
 
@@ -330,7 +330,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://erioifpud.github.io/2019/07/21/关于-Vue-中的-slot-scope/">
+    <link itemprop="mainEntityOfPage" href="http://erioifpud.github.io/2019/07/26/关于前端的-OAuth2/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Erioifpud">
@@ -347,7 +347,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">关于 Vue 中的 slot-scope
+          <h2 class="post-title" itemprop="name headline">关于前端的 OAuth2
 
               
             
@@ -373,7 +373,7 @@
                 
               
 
-              <time title="创建时间：2019-07-21 20:14:04" itemprop="dateCreated datePublished" datetime="2019-07-21T20:14:04+08:00">2019-07-21</time>
+              <time title="创建时间：2019-07-26 03:10:01" itemprop="dateCreated datePublished" datetime="2019-07-26T03:10:01+08:00">2019-07-26</time>
             
 
             
@@ -390,7 +390,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-07-22 03:36:42" itemprop="dateModified" datetime="2019-07-22T03:36:42+08:00">2019-07-22</time>
+                <time title="修改时间：2019-07-27 03:35:45" itemprop="dateModified" datetime="2019-07-27T03:35:45+08:00">2019-07-27</time>
               
             
           </span>
@@ -407,8 +407,8 @@
                   <i class="fa fa-comment-o"></i>
                 </span>
             
-                <a href="/2019/07/21/关于-Vue-中的-slot-scope/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2019/07/21/关于-Vue-中的-slot-scope/" itemprop="commentCount"></span>
+                <a href="/2019/07/26/关于前端的-OAuth2/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2019/07/26/关于前端的-OAuth2/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -430,7 +430,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">2.3k</span>
+                <span title="本文字数">729</span>
               
 
               
@@ -444,7 +444,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">2 分钟</span>
+                <span title="阅读时长">1 分钟</span>
               
             </div>
           
@@ -465,26 +465,22 @@
 
       
         <blockquote>
-<p>其实这个特性我见的不多，所以一直没去了解他的功能，现在觉得这个特性挺灵活的，能写出高复用性的组件。</p>
+<p>记一次做 OAuth2 应用时懵逼的经历</p>
 </blockquote>
-<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>slot scope 是对 slot 功能的增强，主要功能是<u>将子组件中的数据带出给父组件使用</u>，以函数作为例子，可以看作是：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> (<span class="params">list</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> list.map().reduce() <span class="comment">// ......</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>让子组件可以对 props 做一系列的操作，之后将结果通过 slot scope 传递给父组件，让父组件决定显示的方式。</p>
-<p>这种需求之所以要用到 slot scope，原因在于在父组件的作用域中，是无法访问子组件作用域的，就算子组件和父组件同时拥有 user 这个属性，在父组件中 <code>this.user</code> 指向的还是自己本身的 user，所以需要 slot scope 把数据带出来。</p>
-<h1 id="举个例子🌰"><a href="#举个例子🌰" class="headerlink" title="举个例子🌰"></a>举个例子🌰</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;li v-for=&quot;(item, k) in list&quot; :key=&quot;k&quot;&gt;</span><br><span class="line">      &lt;slot :index=&quot;k&quot; :payload=&quot;item&quot;&gt;&lt;/slot&gt;</span><br><span class="line">    &lt;/li&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">export default &#123;</span><br><span class="line">  props: &#123;</span><br><span class="line">    list: Array</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
-<p>这个组件叫做 MakeOrderedList，用于作为有序列表的容器，在父组件中是这样的：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">make-ordered-list</span> <span class="attr">:list</span>=<span class="string">"[&#123;name: 'a', age: 12&#125;, &#123;name: 'abc', age: 10&#125;]"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">template</span> <span class="attr">slot-scope</span>=<span class="string">"scope"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">span</span>&gt;</span>&#123;&#123; scope.index &#125;&#125;<span class="tag">&lt;/<span class="name">span</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"text"</span> <span class="attr">:value</span>=<span class="string">"scope.payload.name"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"number"</span> <span class="attr">:value</span>=<span class="string">"scope.payload.age"</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">template</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">make-ordered-list</span>&gt;</span></span><br></pre></td></tr></table></figure>
-<p>list 是任意格式的列表，子组件会将 list 拆分为 key 和 value，并将这两个属性通过 v-bind 的形式回传，在父组件中通过 <code>slot-scope=&quot;scope&quot;</code> 新建一个名为 scope 的对象<strong>承接子组件回传的属性</strong>，template 中的就是显示的具体结构了。</p>
-<h1 id="换个例子🌰"><a href="#换个例子🌰" class="headerlink" title="换个例子🌰"></a>换个例子🌰</h1><p>刚刚的例子仅仅是为了展示功能，没有意义，这里举 UI 框架中常见的 table 组件作为例子，在 Vuetify 中，table 组件的用法为：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;v-data-table</span><br><span class="line">  :headers=&quot;headers&quot;</span><br><span class="line">  :items=&quot;list&quot;</span><br><span class="line">&gt;</span><br><span class="line">  &lt;template v-slot:items=&quot;props&quot;&gt;</span><br><span class="line">    &lt;td&gt;&#123;&#123; props.item.planet &#125;&#125;&lt;/td&gt;</span><br><span class="line">    &lt;td class=&quot;text-xs-left&quot;&gt;&#123;&#123; props.item.mission &#125;&#125;&lt;/td&gt;</span><br><span class="line">    &lt;td class=&quot;text-xs-left&quot;&gt;&#123;&#123; props.item.type &#125;&#125;&lt;/td&gt;</span><br><span class="line">    &lt;td class=&quot;text-xs-left&quot;&gt;&#123;&#123; props.item.enemy &#125;&#125;&lt;/td&gt;</span><br><span class="line">  &lt;/template&gt;</span><br><span class="line">&lt;/v-data-table&gt;</span><br></pre></td></tr></table></figure>
-<p>data table 这个组件接受了两个 props，他根据 headers 渲染出<u>表头</u>，接受 items 作为表内容，但是不立即渲染出来，而是将元素回传给父组件，<strong>目的是让父组件去决定显示的效果</strong>。</p>
-<h1 id="关于语法"><a href="#关于语法" class="headerlink" title="关于语法"></a>关于语法</h1><p>以上两个例子用了不同的 slot 语法，第二个例子中的语法是新的，大概是 2.6.0 更新的。</p>
-<p>改动：</p>
-<p>插槽的语法从 <code>slot</code> 与 <code>slot=&quot;name&quot;</code> 变成了 <code>v-slot</code> 与 <code>v-slot:name</code>。</p>
-<p>插槽作用域从 <code>slot-scope</code> 改成了 <code>v-slot:slotName</code>，旧版本只能和 <code>slot</code> 组合使用以指定插槽。</p>
-<p>特性：</p>
-<p>新增了动态插槽，通过 <code>v-slot:[dynamicSlotName]</code> 来声明，参考 ES6 的语法。</p>
-<p>新增了<strong>具名插槽</strong>的缩写 <code>#</code>，比如 <code>#name</code>、<code>#header</code>，要注意的是<strong>具名</strong>，默认插槽不能简写，可参考 v-bind 或 v-on（除非写成 <code>#default</code>）。</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><p>这两天在弄授权登录，使用的是 Github 的服务，授权登录的流程很多文章都介绍过，就写个大概吧。</p>
+<ol>
+<li>先是打开授权登录页面。</li>
+<li>完成 Github 登录后页面会跳转到 Github 的认证接口。</li>
+<li>完成认证后会跳转到开发者预留的后端 callback 接口，跳转时会带有 code 参数。</li>
+<li>后端根据 Github 传来的 code（也可能是用户篡改后的），通过 Github 的另一个接口 codeVerify 去验证真实性。</li>
+<li>codeVerify 接口校验成功后会返回 token，后端使用 token 去访问 access 接口，拿取用户的相关信息。</li>
+<li>到这一步，验证流程就结束了。</li>
+</ol>
+<p>我当时先根据这个流程做出了 callback 接口，为了方便调试，将用户信息直接在 response body 中展示了出来，当时觉得没问题。</p>
+<p>之后在前端页面中加入了登录按钮，跳转授权登录页面，在完成 Github 登录后，页面自然也就显示出了我的相关信息，到这一步也没什么问题。</p>
+<p>那么现在问题来了，<u>如何让前端知道用户已经登录了呢</u>？当时摸索了半天，才解决了这个问题，实际上 callback 接口那少了一步，最后不应该将用户信息显示出来，不只是为了安全，<u>最后一步应该是重定向</u>。</p>
+<p>比如，后端在验证成功后，签发一个 token，将 token 通过 url 参数以重定向的形式回传给前端，前端可以顺势显示一个”已登录成功”，再回到首页。</p>
+<h1 id="题外话"><a href="#题外话" class="headerlink" title="题外话"></a>题外话</h1><p>Github 授权登录的接口我其实在几年前就已经实现过了，流程图也看了好几回，但是没有把这个技术完整地在前后端实现一遍，事实上实现起来才会发现一些隐藏的问题，看理论还不一定能意识到。</p>
 
       
     </div>
@@ -508,9 +504,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Vue/" rel="tag"># Vue</a>
-          
-            <a href="/tags/浅析/" rel="tag"># 浅析</a>
+            <a href="/tags/OAuth2/" rel="tag"># OAuth2</a>
           
         </div>
       
@@ -523,8 +517,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/07/20/关于-Throttle-和-Debounce/" rel="next" title="关于 Throttle 和 Debounce">
-                <i class="fa fa-chevron-left"></i> 关于 Throttle 和 Debounce
+              <a href="/2019/07/21/关于-Vue-中的-slot-scope/" rel="next" title="关于 Vue 中的 slot-scope">
+                <i class="fa fa-chevron-left"></i> 关于 Vue 中的 slot-scope
               </a>
             
           </div>
@@ -532,10 +526,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/07/26/关于前端的-OAuth2/" rel="prev" title="关于前端的 OAuth2">
-                关于前端的 OAuth2 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -729,7 +719,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#举个例子🌰"><span class="nav-number">2.</span> <span class="nav-text">举个例子🌰</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#换个例子🌰"><span class="nav-number">3.</span> <span class="nav-text">换个例子🌰</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#关于语法"><span class="nav-number">4.</span> <span class="nav-text">关于语法</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#正文"><span class="nav-number">1.</span> <span class="nav-text">正文</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#题外话"><span class="nav-number">2.</span> <span class="nav-text">题外话</span></a></li></ol></div>
             
 
           </div>
