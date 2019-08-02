@@ -103,18 +103,18 @@
 
 
 
-  <meta name="description" content="概述Vuetify 的栅格系统主要由 3 个组件实现，分别是 v-container、v-layout 和 v-flex，将 viewport 分成了 12 块，并且根据不同的设备分辨率，预设了多种属性，比如 xs、xl，给内容在不同分辨率下的显示尺寸进行便捷地设置。 Viewport Breakpoints直译是视口断点，但我觉得应该翻译成视口别名，内容为：    设备尺寸 别名 尺寸范围">
+  <meta name="description" content="概述Vuetify 的栅格系统主要由 3 个组件实现，分别是 v-container、v-layout 和 v-flex，将 viewport 分成了 12 块，并且根据不同的设备分辨率，预设了多种属性，比如 xs、xl，给内容在不同分辨率下的显示尺寸进行便捷地设置。 栅格系统中还有一个 v-spacer 组件，用于在组件间加入”很宽的”间隔，比如我要在顶栏左侧显示标题，右侧显示按钮，中间的宽度不">
 <meta name="keywords" content="Vue,Vuetify">
 <meta property="og:type" content="article">
 <meta property="og:title" content="关于 Vuetify 的栅格系统">
 <meta property="og:url" content="http://erioifpud.github.io/2019/07/27/关于-Vuetify-的栅格系统/index.html">
 <meta property="og:site_name" content="Erioifpud">
-<meta property="og:description" content="概述Vuetify 的栅格系统主要由 3 个组件实现，分别是 v-container、v-layout 和 v-flex，将 viewport 分成了 12 块，并且根据不同的设备分辨率，预设了多种属性，比如 xs、xl，给内容在不同分辨率下的显示尺寸进行便捷地设置。 Viewport Breakpoints直译是视口断点，但我觉得应该翻译成视口别名，内容为：    设备尺寸 别名 尺寸范围">
+<meta property="og:description" content="概述Vuetify 的栅格系统主要由 3 个组件实现，分别是 v-container、v-layout 和 v-flex，将 viewport 分成了 12 块，并且根据不同的设备分辨率，预设了多种属性，比如 xs、xl，给内容在不同分辨率下的显示尺寸进行便捷地设置。 栅格系统中还有一个 v-spacer 组件，用于在组件间加入”很宽的”间隔，比如我要在顶栏左侧显示标题，右侧显示按钮，中间的宽度不">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-07-29T14:36:18.472Z">
+<meta property="og:updated_time" content="2019-08-02T12:33:36.185Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="关于 Vuetify 的栅格系统">
-<meta name="twitter:description" content="概述Vuetify 的栅格系统主要由 3 个组件实现，分别是 v-container、v-layout 和 v-flex，将 viewport 分成了 12 块，并且根据不同的设备分辨率，预设了多种属性，比如 xs、xl，给内容在不同分辨率下的显示尺寸进行便捷地设置。 Viewport Breakpoints直译是视口断点，但我觉得应该翻译成视口别名，内容为：    设备尺寸 别名 尺寸范围">
+<meta name="twitter:description" content="概述Vuetify 的栅格系统主要由 3 个组件实现，分别是 v-container、v-layout 和 v-flex，将 viewport 分成了 12 块，并且根据不同的设备分辨率，预设了多种属性，比如 xs、xl，给内容在不同分辨率下的显示尺寸进行便捷地设置。 栅格系统中还有一个 v-spacer 组件，用于在组件间加入”很宽的”间隔，比如我要在顶栏左侧显示标题，右侧显示按钮，中间的宽度不">
 
 
 
@@ -390,7 +390,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-07-29 22:36:18" itemprop="dateModified" datetime="2019-07-29T22:36:18+08:00">2019-07-29</time>
+                <time title="修改时间：2019-08-02 20:33:36" itemprop="dateModified" datetime="2019-08-02T20:33:36+08:00">2019-08-02</time>
               
             
           </span>
@@ -430,7 +430,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">5.4k</span>
+                <span title="本文字数">6k</span>
               
 
               
@@ -465,6 +465,7 @@
 
       
         <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>Vuetify 的栅格系统主要由 3 个组件实现，分别是 <code>v-container</code>、<code>v-layout</code> 和 <code>v-flex</code>，将 viewport 分成了 12 块，并且根据不同的设备分辨率，预设了多种属性，比如 xs、xl，给内容在不同分辨率下的显示尺寸进行便捷地设置。</p>
+<p>栅格系统中还有一个 <code>v-spacer</code> 组件，用于在组件间加入”很宽的”间隔，比如我要在顶栏左侧显示标题，右侧显示按钮，中间的宽度不定，这时候就可以使用 <code>v-spacer</code> 进行占位。要注意的是，<code>v-spacer</code> 必须在 flex 容器中使用才能起到占位的效果，否则他的效果会是<strong>换行</strong>。</p>
 <h2 id="Viewport-Breakpoints"><a href="#Viewport-Breakpoints" class="headerlink" title="Viewport Breakpoints"></a>Viewport Breakpoints</h2><p>直译是视口断点，但我觉得应该翻译成<strong>视口别名</strong>，内容为：</p>
 <table>
 <thead>
@@ -906,6 +907,15 @@
 <li><p>默认情况（无 props）下 v-flex 会独占一行吗？</p>
 <p>答：在 v-layout 中，一个<strong>默认</strong> v-flex 的最大宽度为 100%，确实是独占一行，但是当行内存在多个<strong>默认</strong>的 v-flex 时，他们会<strong>平分空间</strong>，因为<u>虽然确定了最大宽度，但是具体宽度还是可以调整的</u>。当有两个 v-flex，且其中一个设置了 xs3 时，xs3 那个会占 25%，另一个占 75%，因为 xs3 确定了新的 <code>max-width</code>，另一个元素的宽度会自己做调整。</p>
 </li>
+<li><p>v-flex 在 nowrap 时的行为是怎么样的。</p>
+<p>网格系统分成了 12 格，flex 占用为 <code>xs4 xs4 xs4</code> 时完美占用一行，占用为 <code>xs3 xs3 xs3</code> 时（不设置 grow），不足一行，会留空，占用为 <code>xs5 xs5 xs5</code> 时，明显超过一行，但<strong>不会换行</strong>（设置了 nowrap），结果会按比例 5:5:5 进行分配。</p>
+</li>
+<li><p>v-container fluid 的意义是什么？默认情况下不是 100% 宽度？</p>
+<p>默认情况下加上 margin 会是 100% 宽度，且 margin 会根据 viewport breakpoint 发生改变，如果希望内容能尽可能靠近边缘，应该加上 fluid，去除 margin。</p>
+</li>
+<li><p>v-spacer 是怎么实现的？</p>
+<p>v-spacer 通过 <code>flex-grow: 1</code> 实现，因此前文才注明需要在 flex 容器中使用。否则 <code>flex-grow</code> 不生效且 v-spacer 将会回退为 div，由于 <code>display: block</code> 导致换行。</p>
+</li>
 </ol>
 
       
@@ -954,6 +964,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/07/31/Vuetify-系列-对-Dialog-函数的封装/" rel="prev" title="[Vuetify 系列] 对 Dialog 函数的封装">
+                [Vuetify 系列] 对 Dialog 函数的封装 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -1029,7 +1043,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">18</span>
+                    <span class="site-state-item-count">19</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1188,7 +1202,7 @@
       <i class="fa fa-area-chart"></i>
     </span>
     
-    <span title="站点总字数">43k</span>
+    <span title="站点总字数">44k</span>
   
 
   
@@ -1197,7 +1211,7 @@
       <i class="fa fa-coffee"></i>
     </span>
     
-    <span title="站点阅读时长">39 分钟</span>
+    <span title="站点阅读时长">40 分钟</span>
   
 </div>
 
