@@ -103,25 +103,25 @@
 
 
 
-  <meta name="description" content="如果你觉得await将原本异步操作变成了同步阻塞的，那你应该对await产生了误解。  事实上，我在早期学习的时候也对 await 有这样的误解，比如说 await setTimeout(XXX, 3000) 会将代码阻塞3秒，相当于Java中的 Thread.sleep(3000)，但这个理解是错误的。 generatorasync/await 是 generator 的语法糖，不用手动调用">
-<meta name="keywords" content="Koa,async&#x2F;await">
+  <meta name="description" content="概述最近在开发的那个项目，需要将 iframe 放入组件，使用 v-for 把 n 个组件渲染出来，此外还需要随时调整组件的显示顺序，效果就像是 win10 里点击一个窗口将它置顶，其他窗口就会下移那样。 坑这样的需求平常写起来很简单，但是加上 iframe 就麻烦了，因为 iframe 动不动就会重新加载，影响体验。 先从变更顺序这个点开始说，现在有个窗口列表，里面包含了所有应该显示的窗口，因为">
+<meta name="keywords" content="Vue,iframe">
 <meta property="og:type" content="article">
-<meta property="og:title" content="为什么Koa使用await后还能保持高效">
-<meta property="og:url" content="http://erioifpud.github.io/2019/04/28/为什么Koa使用await后还能保持高效/index.html">
+<meta property="og:title" content="v-for 遇到 iframe 时的一些坑">
+<meta property="og:url" content="http://erioifpud.github.io/2019/08/09/v-for-和-iframe-不得不说的事/index.html">
 <meta property="og:site_name" content="Erioifpud">
-<meta property="og:description" content="如果你觉得await将原本异步操作变成了同步阻塞的，那你应该对await产生了误解。  事实上，我在早期学习的时候也对 await 有这样的误解，比如说 await setTimeout(XXX, 3000) 会将代码阻塞3秒，相当于Java中的 Thread.sleep(3000)，但这个理解是错误的。 generatorasync/await 是 generator 的语法糖，不用手动调用">
+<meta property="og:description" content="概述最近在开发的那个项目，需要将 iframe 放入组件，使用 v-for 把 n 个组件渲染出来，此外还需要随时调整组件的显示顺序，效果就像是 win10 里点击一个窗口将它置顶，其他窗口就会下移那样。 坑这样的需求平常写起来很简单，但是加上 iframe 就麻烦了，因为 iframe 动不动就会重新加载，影响体验。 先从变更顺序这个点开始说，现在有个窗口列表，里面包含了所有应该显示的窗口，因为">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-08-10T12:29:27.349Z">
+<meta property="og:updated_time" content="2019-09-01T15:41:22.574Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="为什么Koa使用await后还能保持高效">
-<meta name="twitter:description" content="如果你觉得await将原本异步操作变成了同步阻塞的，那你应该对await产生了误解。  事实上，我在早期学习的时候也对 await 有这样的误解，比如说 await setTimeout(XXX, 3000) 会将代码阻塞3秒，相当于Java中的 Thread.sleep(3000)，但这个理解是错误的。 generatorasync/await 是 generator 的语法糖，不用手动调用">
+<meta name="twitter:title" content="v-for 遇到 iframe 时的一些坑">
+<meta name="twitter:description" content="概述最近在开发的那个项目，需要将 iframe 放入组件，使用 v-for 把 n 个组件渲染出来，此外还需要随时调整组件的显示顺序，效果就像是 win10 里点击一个窗口将它置顶，其他窗口就会下移那样。 坑这样的需求平常写起来很简单，但是加上 iframe 就麻烦了，因为 iframe 动不动就会重新加载，影响体验。 先从变更顺序这个点开始说，现在有个窗口列表，里面包含了所有应该显示的窗口，因为">
 
 
 
 
 
 
-  <link rel="canonical" href="http://erioifpud.github.io/2019/04/28/为什么Koa使用await后还能保持高效/">
+  <link rel="canonical" href="http://erioifpud.github.io/2019/08/09/v-for-和-iframe-不得不说的事/">
 
 
 
@@ -131,7 +131,7 @@
   };
 </script>
 
-  <title>为什么Koa使用await后还能保持高效 | Erioifpud</title>
+  <title>v-for 遇到 iframe 时的一些坑 | Erioifpud</title>
   
 
 
@@ -330,7 +330,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://erioifpud.github.io/2019/04/28/为什么Koa使用await后还能保持高效/">
+    <link itemprop="mainEntityOfPage" href="http://erioifpud.github.io/2019/08/09/v-for-和-iframe-不得不说的事/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Erioifpud">
@@ -347,7 +347,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">为什么Koa使用await后还能保持高效
+          <h2 class="post-title" itemprop="name headline">v-for 遇到 iframe 时的一些坑
 
               
             
@@ -373,7 +373,7 @@
                 
               
 
-              <time title="创建时间：2019-04-28 12:26:51" itemprop="dateCreated datePublished" datetime="2019-04-28T12:26:51+08:00">2019-04-28</time>
+              <time title="创建时间：2019-08-09 21:40:45" itemprop="dateCreated datePublished" datetime="2019-08-09T21:40:45+08:00">2019-08-09</time>
             
 
             
@@ -390,7 +390,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-08-10 20:29:27" itemprop="dateModified" datetime="2019-08-10T20:29:27+08:00">2019-08-10</time>
+                <time title="修改时间：2019-09-01 23:41:22" itemprop="dateModified" datetime="2019-09-01T23:41:22+08:00">2019-09-01</time>
               
             
           </span>
@@ -407,8 +407,8 @@
                   <i class="fa fa-comment-o"></i>
                 </span>
             
-                <a href="/2019/04/28/为什么Koa使用await后还能保持高效/#comments" itemprop="discussionUrl">
-                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2019/04/28/为什么Koa使用await后还能保持高效/" itemprop="commentCount"></span>
+                <a href="/2019/08/09/v-for-和-iframe-不得不说的事/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2019/08/09/v-for-和-iframe-不得不说的事/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -430,7 +430,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">731</span>
+                <span title="本文字数">2.2k</span>
               
 
               
@@ -444,7 +444,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">1 分钟</span>
+                <span title="阅读时长">2 分钟</span>
               
             </div>
           
@@ -464,14 +464,30 @@
       
 
       
-        <blockquote>
-<p>如果你觉得await将原本异步操作变成了同步阻塞的，那你应该对await产生了误解。</p>
-</blockquote>
-<p>事实上，我在早期学习的时候也对 await 有这样的误解，比如说 <code>await setTimeout(XXX, 3000)</code> 会将代码阻塞3秒，相当于Java中的 <code>Thread.sleep(3000)</code>，<strong>但这个理解是错误的</strong>。</p>
-<h1 id="generator"><a href="#generator" class="headerlink" title="generator"></a>generator</h1><p>async/await 是 generator 的语法糖，不用手动调用 <code>next</code> 函数。<br>先考虑异步操作的特点，最主要的就是注册顺序确定，但执行顺序不确定，就算连续出现多个异步操作，也无法保证他们的回调是顺序运行的。为了控制回调的执行顺序，以往的方法是在回调中注册异步操作，显而易见，这个会造成“回调地狱”，但 generator 中的<strong>yield</strong>就能有效解决这个问题。</p>
-<p>和<code>return</code>不同，使用<code>yield</code>能在generator中“返回”多次，比如说有3个 <code>yield</code>，每次调用 <code>next</code> 函数，都会执行到 <code>yield</code>后暂停，直到再次调用 <code>next</code> 函数，在 <code>yield</code> 执行一个异步操作就能以平铺的形式去设置顺序敏感的操作，在<strong>每次“返回”之后都能去做其他的事情</strong>。</p>
-<h1 id="await"><a href="#await" class="headerlink" title="await"></a>await</h1><p>generator需要调用<code>next</code>函数去继续运行，<code>await</code> 会自动使用 <code>next</code>，无需显式调用，在多个连续的 <code>await</code> 中，每次都会等待本次操作完成后再执行下一个操作，但这并不是同步阻塞的，这里是<strong>协程</strong>，在异步完成前程序该做什么就做什么，在完成后 <code>await</code> 会获取执行结果，接着运行后面的代码。</p>
-<p>所以就算在Controller中使用了 <code>await</code>，比如进行 BCrypt 运算，在运算的过程中，程序依然会正常运行下去，在运算结束拿到结果后才会继续运行下去。</p>
+        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>最近在开发的那个项目，需要将 iframe 放入组件，使用 v-for 把 n 个组件渲染出来，此外还需要随时调整<strong>组件的显示顺序</strong>，效果就像是 win10 里点击一个窗口将它置顶，其他窗口就会下移那样。</p>
+<h1 id="坑"><a href="#坑" class="headerlink" title="坑"></a>坑</h1><p>这样的需求平常写起来很简单，但是加上 iframe 就麻烦了，因为 iframe 动不动就会重新加载，影响体验。</p>
+<p>先从变更顺序这个点开始说，现在有个窗口列表，里面包含了所有应该显示的窗口，因为 v-for 是按顺序遍历的，所以<u>列表的最后一个元素会显示在最上层</u>，那么<u>置顶操作就相当于”将一个元素移至末尾”</u>。</p>
+<p>听起来很简单是吧，那先写一段实现：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">handle (state, payload) &#123;</span><br><span class="line">  <span class="keyword">if</span> (!state.list.includes(payload)) &#123;</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">const</span> index = state.list.indexOf(payload)</span><br><span class="line">  state.list.splice(index, <span class="number">1</span>)</span><br><span class="line">  state.list.push(payload)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>删除这个窗口，再把它放到列表末尾，看起来好像没问题，用起来就出问题了，交换位置的时候这个窗口中的 iframe 重新加载了。</p>
+<p>那换一种方法，不删除元素，直接交换两个元素的位置：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">handle (state, payload) &#123;</span><br><span class="line">  <span class="keyword">if</span> (!state.list.includes(payload)) &#123;</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">const</span> index = state.list.indexOf(payload)</span><br><span class="line">  <span class="keyword">const</span> lastIndex = state.list.length - <span class="number">1</span></span><br><span class="line">  <span class="keyword">const</span> temp = state.list[index]</span><br><span class="line">  state.list[index] = state.list[lastIndex]</span><br><span class="line">  state.list[lastIndex] = temp</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>元素位置确实变了，但是 vuex 也确实监听不到 list 的变化。</p>
+<p>在方法 2 的基础上做一些修改，给 list 重新赋值：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">handle (state, payload) &#123;</span><br><span class="line">  <span class="keyword">if</span> (!state.list.includes(payload)) &#123;</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">const</span> index = state.list.indexOf(payload)</span><br><span class="line">  <span class="keyword">const</span> lastIndex = state.list.length - <span class="number">1</span></span><br><span class="line">  <span class="keyword">const</span> temp = state.list[index]</span><br><span class="line">  state.list[index] = state.list[lastIndex]</span><br><span class="line">  state.list[lastIndex] = temp</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">const</span> tempList = state.list</span><br><span class="line">  state.list = []</span><br><span class="line">  state.list = tempList</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>强制更新了 list，vuex 也能检测到了，但是 iframe 重置了。</p>
+<p>换一种更新的方法：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">handle (state, payload) &#123;</span><br><span class="line">  <span class="keyword">if</span> (!state.list.includes(payload)) &#123;</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">const</span> index = state.list.indexOf(payload)</span><br><span class="line">  <span class="keyword">const</span> lastIndex = state.list.length - <span class="number">1</span></span><br><span class="line">  <span class="keyword">const</span> temp = state.list[index]</span><br><span class="line">  state.list[index] = state.list[lastIndex]</span><br><span class="line">  state.list[lastIndex] = temp</span><br><span class="line">  </span><br><span class="line">  state.push(<span class="literal">undefined</span>)</span><br><span class="line">  state.pop()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>还是一样，list 更新，vuex 更新，iframe 也重置。</p>
+<iframe src="https://codesandbox.io/embed/array-sort-test-b9tem?autoresize=1&fontsize=14&hidenavigation=1&module=%2Fsrc%2Fstore.js" title="array sort test" allow="geolocation; microphone; camera; midi; vr; accelerometer; gyroscope; payment; ambient-light-sensor; encrypted-media" style="width:100%; height:500px; border:0; border-radius: 4px; overflow:hidden;" sandbox="allow-modals allow-forms allow-popups allow-scripts allow-same-origin"></iframe>
+
+
+
+<h1 id="排除其他因素"><a href="#排除其他因素" class="headerlink" title="排除其他因素"></a>排除其他因素</h1><p>这里要排除一种情况，为 v-for 正名，就是 <u>v-for 在遇到顺序变更的情况并不会重载组件，只是更改顺序而已</u>。</p>
+<p>为了证明这一点，可以将 <code>\{\{ +new Date() \}\}</code> 放入 template 中，或者使用 <code>beforeDestroy</code> 钩子，事实上更改顺序之后组件的日期并不会更新，而且 <code>beforeDestroy</code> 也不会被触发。</p>
+<p>所以这种”异常”的情况只是 iframe 自己的锅。</p>
+<h1 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h1><p>既然变更顺序的排序方式不好使，那就换一种思路，<strong>在不更改元素 index 的前提下对元素位置进行改变</strong>，也就是让元素自己保留一个 order 属性去记录位置。每一次置顶，先过滤出比当前窗口 order 大的窗口列表，得到列表长度，并且让这些窗口的 order 减去 1，再让当前窗口的 order 加上列表长度。比方说 1 2 3 4 5 的窗口 2 要置顶，先将 3 4 5 分别减 1，再让 2 加上长度 3。</p>
+<h1 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h1><p>原因暂时不清楚。</p>
 
       
     </div>
@@ -495,9 +511,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Koa/" rel="tag"># Koa</a>
+            <a href="/tags/Vue/" rel="tag"># Vue</a>
           
-            <a href="/tags/async-await/" rel="tag"># async/await</a>
+            <a href="/tags/iframe/" rel="tag"># iframe</a>
           
         </div>
       
@@ -510,8 +526,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/04/01/对Vue事件机制错误理解的纠正/" rel="next" title="Vue 细节分析 - $emit 和 $on，你的理解正确吗？">
-                <i class="fa fa-chevron-left"></i> Vue 细节分析 - $emit 和 $on，你的理解正确吗？
+              <a href="/2019/07/31/Vuetify-系列-对-Dialog-函数的封装/" rel="next" title="Vuetify 系列 - 对 Dialog 函数的封装">
+                <i class="fa fa-chevron-left"></i> Vuetify 系列 - 对 Dialog 函数的封装
               </a>
             
           </div>
@@ -519,10 +535,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019/05/01/关于函数的Wrapper/" rel="prev" title="关于函数的Wrapper">
-                关于函数的Wrapper <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -724,7 +736,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#generator"><span class="nav-number">1.</span> <span class="nav-text">generator</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#await"><span class="nav-number">2.</span> <span class="nav-text">await</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#坑"><span class="nav-number">2.</span> <span class="nav-text">坑</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#排除其他因素"><span class="nav-number">3.</span> <span class="nav-text">排除其他因素</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解决方案"><span class="nav-number">4.</span> <span class="nav-text">解决方案</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#原因"><span class="nav-number">5.</span> <span class="nav-text">原因</span></a></li></ol></div>
             
 
           </div>
