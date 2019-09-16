@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=6.7.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.7.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.7.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.7.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.7.0',
+    sidebar: {"position":"right","display":"post","offset":12,"b2t":true,"scrollpercent":true,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="概述KeepAlive 组件实现了缓存的功能，将不活动的组件放到内存中，而不是直接销毁他们，并且他不会被渲染成一个真实的元素，主要的使用场景为”在切换页面保存表单内容”。 本文将从源码入手，分析 KeepAlive 的实现方式以及使用上的注意事项，并简单提一下 KeepAlive 不会被渲染成真实的元素的原因。 实现现版本的 keep-alive.js 总共有 124 行，文件内既有组件，又有外部">
+<meta name="keywords" content="Vue,浅析,Vue 细节分析">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于 keep-alive 组件">
+<meta property="og:url" content="http://erioifpud.github.io/2019/09/01/关于-keep-alive-组件/index.html">
+<meta property="og:site_name" content="Erioifpud">
+<meta property="og:description" content="概述KeepAlive 组件实现了缓存的功能，将不活动的组件放到内存中，而不是直接销毁他们，并且他不会被渲染成一个真实的元素，主要的使用场景为”在切换页面保存表单内容”。 本文将从源码入手，分析 KeepAlive 的实现方式以及使用上的注意事项，并简单提一下 KeepAlive 不会被渲染成真实的元素的原因。 实现现版本的 keep-alive.js 总共有 124 行，文件内既有组件，又有外部">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-02T09:37:02.569Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="关于 keep-alive 组件">
+<meta name="twitter:description" content="概述KeepAlive 组件实现了缓存的功能，将不活动的组件放到内存中，而不是直接销毁他们，并且他不会被渲染成一个真实的元素，主要的使用场景为”在切换页面保存表单内容”。 本文将从源码入手，分析 KeepAlive 的实现方式以及使用上的注意事项，并简单提一下 KeepAlive 不会被渲染成真实的元素的原因。 实现现版本的 keep-alive.js 总共有 124 行，文件内既有组件，又有外部">
+
+
+
+
+
+
+  <link rel="canonical" href="http://erioifpud.github.io/2019/09/01/关于-keep-alive-组件/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>关于 keep-alive 组件 | Erioifpud</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Erioifpud</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/404/" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>404</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://erioifpud.github.io/2019/09/01/关于-keep-alive-组件/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Erioifpud">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://avatars0.githubusercontent.com/u/8306955?s=460&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Erioifpud">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">关于 keep-alive 组件
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-01 04:16:40" itemprop="dateCreated datePublished" datetime="2019-09-01T04:16:40+08:00">2019-09-01</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-02 17:37:02" itemprop="dateModified" datetime="2019-09-02T17:37:02+08:00">2019-09-02</time>
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+              
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <a href="/2019/09/01/关于-keep-alive-组件/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2019/09/01/关于-keep-alive-组件/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">4.9k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">4 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>KeepAlive 组件实现了缓存的功能，将不活动的组件放到内存中，而不是直接销毁他们，并且他不会被渲染成一个真实的元素，主要的使用场景为”在切换页面保存表单内容”。</p>
+<p>本文将从源码入手，分析 KeepAlive 的实现方式以及使用上的注意事项，并简单提一下 KeepAlive 不会被渲染成真实的元素的原因。</p>
+<h1 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h1><p>现版本的 keep-alive.js 总共有 124 行，文件内既有组件，又有外部的功能函数，先从组件入手。</p>
+<h2 id="组件整体"><a href="#组件整体" class="headerlink" title="组件整体"></a>组件整体</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">props: &#123;</span><br><span class="line">  include: patternTypes,</span><br><span class="line">  exclude: patternTypes,</span><br><span class="line">  max: [<span class="built_in">String</span>, <span class="built_in">Number</span>]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">created () &#123;</span><br><span class="line">  <span class="keyword">this</span>.cache = <span class="built_in">Object</span>.create(<span class="literal">null</span>)</span><br><span class="line">  <span class="keyword">this</span>.keys = []</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">destroyed () &#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">const</span> key <span class="keyword">in</span> <span class="keyword">this</span>.cache) &#123;</span><br><span class="line">    pruneCacheEntry(<span class="keyword">this</span>.cache, key, <span class="keyword">this</span>.keys)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">mounted () &#123;</span><br><span class="line">  <span class="keyword">this</span>.$watch(<span class="string">'include'</span>, val =&gt; &#123;</span><br><span class="line">    pruneCache(<span class="keyword">this</span>, name =&gt; matches(val, name))</span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="keyword">this</span>.$watch(<span class="string">'exclude'</span>, val =&gt; &#123;</span><br><span class="line">    pruneCache(<span class="keyword">this</span>, name =&gt; !matches(val, name))</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>KeepAlive 组件包含了 4 个 props，通过 render 函数进行渲染，并且在 created 钩子中定义了 cache 和 keys，mounted 中设置了两个 watch。</p>
+<p>根据文档可以得知，props 中的 include 表示 “<u>需要缓存的组件名称或 RegExp</u>“，exclude 表示的是 “<u>不需要缓存的组件名称或 RegExp</u>“，max 表示 “<u>缓存组件的数目上限</u>“。</p>
+<p>cache 是缓存本身，<code>Object.create(null)</code> 会创建一个 “非常干净” 的对象，这个对象<strong>不从 <code>Object</code> 处继承任何函数</strong>，纯粹是为了储存键值对，键是名称，值是虚拟节点 vnode。</p>
+<p>keys 是一个数组，储存的是 vnode 的名称，他和 cache 的键在<strong>功能上并不重复</strong>，因为他是为了<strong>保持 vnode 顺序</strong>而存在的。</p>
+<h2 id="render-函数"><a href="#render-函数" class="headerlink" title="render 函数"></a>render 函数</h2><p>接下来看 render 函数：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> slot = <span class="keyword">this</span>.$slots.default</span><br><span class="line"><span class="keyword">const</span> vnode: VNode = getFirstComponentChild(slot)</span><br><span class="line"><span class="keyword">const</span> componentOptions: ?VNodeComponentOptions = vnode &amp;&amp; vnode.componentOptions</span><br></pre></td></tr></table></figure>
+<p>slot 是 KeepAlive 组件的默认插槽，他是一个<strong>数组</strong>，vnode 在插槽数组中找到第一个组件的虚拟节点，关键点是 “<strong>第一个</strong>“ 和 “<strong>组件</strong>“ 。</p>
+<p>也就是说，如果 KeepAlive 的第一个子元素是 div，那么 <u>div 会被忽略</u>，如果同时有多个组件作为子元素，那么<u>会选用第一个</u>。</p>
+<p>componentOptions 是虚拟节点 vnode 对应组件的信息或者 undefined。</p>
+<h3 id="render-的第一部分"><a href="#render-的第一部分" class="headerlink" title="render 的第一部分"></a>render 的第一部分</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">render () &#123;</span><br><span class="line">  <span class="keyword">if</span> (componentOptions) &#123;</span><br><span class="line">    <span class="comment">// check pattern</span></span><br><span class="line">    <span class="keyword">const</span> name: ?string = getComponentName(componentOptions)</span><br><span class="line">    <span class="keyword">const</span> &#123; include, exclude &#125; = <span class="keyword">this</span></span><br><span class="line">    <span class="keyword">if</span> (</span><br><span class="line">      <span class="comment">// not included</span></span><br><span class="line">      (include &amp;&amp; (!name || !matches(include, name))) ||</span><br><span class="line">      <span class="comment">// excluded</span></span><br><span class="line">      (exclude &amp;&amp; name &amp;&amp; matches(exclude, name))</span><br><span class="line">    ) &#123;</span><br><span class="line">      <span class="keyword">return</span> vnode</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 省略第二部分代码</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> vnode || (slot &amp;&amp; slot[<span class="number">0</span>])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来是一个判断，如果 vnode <strong>对应的不是组件</strong>，那么直接显示 vnode 或者<strong>默认插槽的第一项</strong>，要注意的是 “<strong>第一项</strong>“，并不会原样显示。</p>
+<p>那么按照 <code>true</code> 的情况，会通过 <code>getComponentName</code> 函数取得组件名称 name，函数实现如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getComponentName</span> (<span class="params">opts: ?VNodeComponentOptions</span>): ?<span class="title">string</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> opts &amp;&amp; (opts.Ctor.options.name || opts.tag)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>Ctor</code> 是<strong>组件的构造函数</strong>，这里优先使用组件中定义的 name，也就是开发者自己给组件设置的，备选方案是组件自己生成的 tag，比如 “<u>vue-component-14</u>“。</p>
+<p>接着从 KeepAlive 的 props 中取得实际的 include 与 exclude，判断条件如下：</p>
+<ol>
+<li>组件名称 name <strong>不在 include</strong></li>
+<li>组件名称 name <strong>存在于 exclude</strong></li>
+<li>include 与 exclude 都未定义</li>
+</ol>
+<p>满足任意一项都不用看下去了，这表示<strong>组件不在缓存目标里</strong>，直接显示该组件的 vnode。</p>
+<p><code>matches</code> 函数是用来匹配的，通过数组、字符串和正则表达式的方式，匹配 name 与 include / exclude，代码没啥展示的意义。</p>
+<h3 id="render-的第二部分"><a href="#render-的第二部分" class="headerlink" title="render 的第二部分"></a>render 的第二部分</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">render () &#123;</span><br><span class="line">  <span class="keyword">if</span> (componentOptions) &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 省略第一部分代码</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">const</span> &#123; cache, keys &#125; = <span class="keyword">this</span></span><br><span class="line">    <span class="keyword">const</span> key: ?string = vnode.key == <span class="literal">null</span></span><br><span class="line">        <span class="comment">// same constructor may get registered as different local components</span></span><br><span class="line">        <span class="comment">// so cid alone is not enough (#3269)</span></span><br><span class="line">      ? componentOptions.Ctor.cid + (componentOptions.tag ? <span class="string">`::<span class="subst">$&#123;componentOptions.tag&#125;</span>`</span> : <span class="string">''</span>)</span><br><span class="line">      : vnode.key</span><br><span class="line">    <span class="keyword">if</span> (cache[key]) &#123;</span><br><span class="line">      vnode.componentInstance = cache[key].componentInstance</span><br><span class="line">      <span class="comment">// make current key freshest</span></span><br><span class="line">      remove(keys, key)</span><br><span class="line">      keys.push(key)</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      cache[key] = vnode</span><br><span class="line">      keys.push(key)</span><br><span class="line">      <span class="comment">// prune oldest entry</span></span><br><span class="line">      <span class="keyword">if</span> (<span class="keyword">this</span>.max &amp;&amp; keys.length &gt; <span class="built_in">parseInt</span>(<span class="keyword">this</span>.max)) &#123;</span><br><span class="line">        pruneCacheEntry(cache, keys[<span class="number">0</span>], keys, <span class="keyword">this</span>._vnode)</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    vnode.data.keepAlive = <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> vnode || (slot &amp;&amp; slot[<span class="number">0</span>])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首先得到虚拟节点 vnode 的<strong>唯一 key</strong>，根据 key 检查缓存是否命中，如果命中了，那就<strong>把 vnode 对应的组件实例显示出来</strong>，然后将 key 移动到 key 的末尾。</p>
+<p>如果未命中，那么将 vnode 放到缓存容器 cache 中，将 key 放到 keys 中，接着是判断缓存数量<strong>是否超过上限</strong> max，超过了就调用 <code>pruneCacheEntry(cache, keys[0], keys, this._vnode)</code>。</p>
+<p>来看看 <code>pruneCacheEntry</code> 的实现：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">pruneCacheEntry</span> (<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  cache: VNodeCache,</span></span></span><br><span class="line"><span class="function"><span class="params">  key: string,</span></span></span><br><span class="line"><span class="function"><span class="params">  keys: Array&lt;string&gt;,</span></span></span><br><span class="line"><span class="function"><span class="params">  current?: VNode</span></span></span><br><span class="line"><span class="function"><span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> cached = cache[key]</span><br><span class="line">  <span class="keyword">if</span> (cached &amp;&amp; (!current || cached.tag !== current.tag)) &#123;</span><br><span class="line">    cached.componentInstance.$destroy()</span><br><span class="line">  &#125;</span><br><span class="line">  cache[key] = <span class="literal">null</span></span><br><span class="line">  remove(keys, key)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个函数的功能是<strong>将指定的 vnode 移出缓存容器</strong>，在 cached <strong>未被渲染时</strong>会先将组件实例销毁。</p>
+<p>所以结合上下文， <code>pruneCacheEntry(cache, keys[0], keys, this._vnode)</code> 的作用是在超过缓存上限 max 后，<strong>将缓存中的第一个组件删除</strong>。</p>
+<h3 id="render-总结"><a href="#render-总结" class="headerlink" title="render 总结"></a>render 总结</h3><p>render 函数会在每一次渲染的时候执行，他会 “监听” 默认插槽第一个 vnode 的变化，得到对应的组件信息，如果<u>组件的名称不在要缓存的名单里，那么就直接渲染</u>。</p>
+<p>否则构建出组件的唯一 key，看看这个 key 是否命中缓存，是就<u>从缓存里拿出实例去渲染</u>，否则将其缓存，并考虑缓存数量是否过上限。</p>
+<h2 id="mounted"><a href="#mounted" class="headerlink" title="mounted"></a>mounted</h2><p>mounted 中定义了两个 watch 函数，监听 include 与 exclude 的变化，通过 <code>pruneCache</code> <strong>将不在缓存名单的 vnode 即时移除</strong>。</p>
+<h2 id="destroy"><a href="#destroy" class="headerlink" title="destroy"></a>destroy</h2><p>在 KeepAlive 组件被销毁时，遍历缓存容器 cache，将里面的 vnode 全部移除。</p>
+<h1 id="抽象组件"><a href="#抽象组件" class="headerlink" title="抽象组件"></a>抽象组件</h1><p>KeepAlive 组件对象中设置了一句 <code>abstract: true</code>，这项设置可以让组件不被渲染成真实元素，并且 KeepAlive 的子元素的 <code>$parent</code> 会指向 KeepAlive 的父元素，同样的，Transition 也是一个抽象组件。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>其实要注意的地方刚刚已经提过了，KeepAlive <u>只关注默认插槽中的第一个 Vue 组件</u>，在没有满足条件的组件时会<u>直接显示 vnode 或默认插槽第一项</u>，被缓存的 vnode 也会跟着 include 与 exclude 不断发生变化，并不是缓存后就保持不变等着取用的。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Vue/" rel="tag"># Vue</a>
+          
+            <a href="/tags/浅析/" rel="tag"># 浅析</a>
+          
+            <a href="/tags/Vue-细节分析/" rel="tag"># Vue 细节分析</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/09/v-for-和-iframe-不得不说的事/" rel="next" title="v-for 遇到 iframe 时的一些坑">
+                <i class="fa fa-chevron-left"></i> v-for 遇到 iframe 时的一些坑
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://avatars0.githubusercontent.com/u/8306955?s=460&v=4" alt="Erioifpud">
+            
+              <p class="site-author-name" itemprop="name">Erioifpud</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">21</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">22</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <span class="exturl" data-url="aHR0cHM6Ly9naXRodWIuY29tL0VyaW9pZnB1ZA==" title="GitHub &rarr; https://github.com/Erioifpud"><i class="fa fa-fw fa-github"></i></span>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                  
+                    
+                  
+                  <span class="exturl" data-url="bWFpbHRvOmVyaW9pZnB1ZC5jbkBnbWFpbC5jb20=" title="E-Mail &rarr; mailto:erioifpud.cn@gmail.com"><i class="fa fa-fw fa-envelope"></i></span>
+                </span>
+              
+            </div>
+          
+
+          
+             <div class="cc-license motion-element" itemprop="license">
+              
+                
+              
+              
+              
+              <span class="exturl cc-opacity" data-url="aHR0cHM6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL2xpY2Vuc2VzL2J5LW5jLXNhLzQuMC8="><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></span>
+             </div>
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实现"><span class="nav-number">2.</span> <span class="nav-text">实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#组件整体"><span class="nav-number">2.1.</span> <span class="nav-text">组件整体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#render-函数"><span class="nav-number">2.2.</span> <span class="nav-text">render 函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#render-的第一部分"><span class="nav-number">2.2.1.</span> <span class="nav-text">render 的第一部分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#render-的第二部分"><span class="nav-number">2.2.2.</span> <span class="nav-text">render 的第二部分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#render-总结"><span class="nav-number">2.2.3.</span> <span class="nav-text">render 总结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mounted"><span class="nav-number">2.3.</span> <span class="nav-text">mounted</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#destroy"><span class="nav-number">2.4.</span> <span class="nav-text">destroy</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#抽象组件"><span class="nav-number">3.</span> <span class="nav-text">抽象组件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+            <span id="scrollpercent"><span>0</span>%</span>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Erioifpud</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+    <span title="站点总字数">57k</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+    <span title="站点阅读时长">52 分钟</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <span class="exturl theme-link" data-url="aHR0cHM6Ly9oZXhvLmlv">Hexo</span> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <span class="exturl theme-link" data-url="aHR0cHM6Ly90aGVtZS1uZXh0Lm9yZw==">NexT.Gemini</span> v6.7.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.7.0"></script>
+
+  <script src="/js/src/motion.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=6.7.0"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=6.7.0"></script>
+
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=6.7.0"></script>
+<script src="/js/src/post-details.js?v=6.7.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.7.0"></script>
+
+
+
+  
+  
+
+<script src="//cdn1.lncld.net/static/js/3.11.1/av-min.js"></script>
+
+
+
+<script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+
+<script>
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(function(item) {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: true,
+    notify: false,
+    appId: 'yd5UduWAp5NDPPLcwbkMt3mr-gzGzoHsz',
+    appKey: 'cDTF4AyU1bxs1iJblUWCi8dt',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: false
+  });
+</script>
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+      }
+      else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+  
+  
+  <script src="/lib/pangu/dist/pangu.min.js?v=3.3"></script>
+  <script>pangu.spacingPage();</script>
+
+
+  
+
+  
+  <script src="/js/src/exturl.js?v=6.7.0"></script>
+
+
+  
+
+  
+  <style>
+    .copy-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 20px;
+      color: #333;
+      white-space: nowrap;
+      vertical-align: middle;
+      cursor: pointer;
+      background-color: #eee;
+      background-image: linear-gradient(#fcfcfc, #eee);
+      border: 1px solid #d5d5d5;
+      border-radius: 3px;
+      user-select: none;
+      outline: 0;
+    }
+
+    .highlight-wrap .copy-btn {
+      transition: opacity .3s ease-in-out;
+      opacity: 0;
+      padding: 2px 6px;
+      position: absolute;
+      right: 4px;
+      top: 8px;
+    }
+
+    .highlight-wrap:hover .copy-btn,
+    .highlight-wrap .copy-btn:focus {
+      opacity: 1
+    }
+
+    .highlight-wrap {
+      position: relative;
+    }
+  </style>
+  <script>
+    $('.highlight').each(function(i, e) {
+      var $wrap = $('<div>').addClass('highlight-wrap');
+      $(e).after($wrap);
+      $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+        var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+          return $(e).text();
+        }).toArray().join('\n');
+        var ta = document.createElement('textarea');
+        var range = document.createRange(); //For Chrome
+        var sel = window.getSelection(); //For Chrome
+        var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+        ta.style.top = yPosition + 'px'; //Prevent page scroll
+        ta.style.position = 'absolute';
+        ta.style.opacity = '0';
+        ta.value = code;
+        ta.textContent = code; //For FireFox
+        ta.contentEditable = true;
+        ta.readOnly = false;
+        document.body.appendChild(ta);
+        range.selectNode(ta);
+        sel.removeAllRanges();
+        sel.addRange(range);
+        ta.setSelectionRange(0, code.length);
+        var result = document.execCommand('copy');
+        
+          if (result) $(this).text('复制成功');
+          else $(this).text('复制失败');
+        
+        ta.blur(); //For iOS
+        $(this).blur();
+      })).on('mouseleave', function(e) {
+        var $b = $(this).find('.copy-btn');
+        setTimeout(function() {
+          $b.text('复制');
+        }, 300);
+      }).append(e);
+    })
+  </script>
+
+
+  
+
+</body>
+</html>
